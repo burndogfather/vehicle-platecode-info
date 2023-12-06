@@ -59,9 +59,9 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		var strVar string
 		err := chromedp.Run(taskCtx,
-			chromedp.Navigate("https://pkg.go.dev/fmt"),
-			chromedp.WaitVisible("body > footer"),
-			chromedp.Value("body", &strVar),
+			chromedp.Navigate("https://www.google.com/search?q=test"),
+			chromedp.WaitVisible("body"),
+			chromedp.Value("#result-stats", &strVar),
 		)
 		
 		//실패시 fail출력

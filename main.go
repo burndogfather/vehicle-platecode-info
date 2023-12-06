@@ -61,7 +61,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		err := chromedp.Run(taskCtx,
 			chromedp.Navigate("https://pkg.go.dev/fmt"),
 			chromedp.WaitVisible("body > footer"),
-			chromedp.Value("#hdr-Printing", &strVar),
+			chromedp.Value("body", &strVar),
 		)
 		
 		//실패시 fail출력

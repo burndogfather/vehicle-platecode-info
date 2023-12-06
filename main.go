@@ -45,7 +45,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		//Map풀기
 		//platecode := postdata["platecode"][0]
 		
-		var url = 'https://golang.org/pkg/fmt/';
 		
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
@@ -60,7 +59,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		var strVar string
 		err := chromedp.Run(taskCtx,
-			chromedp.Navigate(url),
+			chromedp.Navigate("https://golang.org/pkg/fmt/"),
 			chromedp.WaitVisible("body > footer"),
 			chromedp.Click("#pkg-examples > div", chromedp.NodeVisible),
 			chromedp.Value("#example_Println .play .input textarea", &strVar),

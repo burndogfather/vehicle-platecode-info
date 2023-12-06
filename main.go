@@ -48,6 +48,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//Map풀기
 		platecode := postdata["platecode"][0]
+		fmt.println(platecode)
 		
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
@@ -61,8 +62,8 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		defer cancel()
 		
 		//사이트 캡쳐해서 버퍼생성
-		var pdfBuffer []byte
-		if err := chromedp.Run(taskCtx, pdfGrabber(url, element, &pdfBuffer)); err != nil {
+		var outputStr string
+		if err := chromedp.Run(taskCtx, pdfGrabber("https://www.google.co.kr", element, &outputStr)); err != nil {
 			//실패시 fail출력
 			res.Header().Set("Content-Type", "application/json")
 			resdata["status"] = "fail"
@@ -76,8 +77,14 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		}
 		
 		//성공시 PDF형태로출력
-		res.Header().Set("Content-Type", "application/pdf")
-		res.Write(pdfBuffer)
+		res.Header().Set("Content-Type", "application/json")
+		resdata["status"] = "success"
+		resdata["data"] = "Parameter ERROR!"
+		output, err := json.Marshal(resdata)
+		if err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+		res.Write(output)
 		return 
 		
 	}else{
@@ -95,7 +102,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 //PDF생성함수
-func pdfGrabber(url string, sel string, res *[]byte) chromedp.Tasks {
+func pdfGrabber(url string, sel string, res string) chromedp.Tasks {
 	//실행시간 측정시작
 	start := time.Now()
 	return chromedp.Tasks{

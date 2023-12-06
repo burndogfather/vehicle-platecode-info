@@ -7,7 +7,7 @@ import (
 	"time"
 	"fmt"
 	
-	"github.com/chromedp/cdproto/network"
+	_"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
 )
@@ -64,7 +64,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//사이트 캡쳐해서 버퍼생성
 		var carPrice string
-		var consoleMessages []*chromedp.ConsoleMessage
 
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
@@ -80,9 +79,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 		}
 		
-		for _, msg := range consoleMessages {
-			log.Println("Console message:", msg.Text)
-		}
 		
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")

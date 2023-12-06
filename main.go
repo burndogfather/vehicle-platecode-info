@@ -62,7 +62,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		//사이트 캡쳐해서 버퍼생성
 		var outputStr string
 		err := chromedp.Run(taskCtx,
-			emulation.SetUserAgentOverride(`WebScraper 1.0`), //USER AGENT설정
+			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://pkg.dadolcorp.com/test/multiselect_multi`),
 			chromedp.WaitVisible(`body`, chromedp.ByQuery),
 			chromedp.Value(`main.html_here > input#test3`, &outputStr),

@@ -41,12 +41,11 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	postdata := req.PostForm
 	
-	//POST 데이터에서 url이라는 값을 찾아서 String을 벗기기(?)
-	if ( postdata["url"] != nil && postdata["element"] != nil){ 
+	//POST 데이터에서 차량번호 값을 찾아서 String을 벗기기(?)
+	if ( postdata["platecode"] != nil){ 
 		
 		//Map풀기
-		url := postdata["url"][0]
-		element := postdata["element"][0]
+		platecode := postdata["platecode"][0]
 		
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
@@ -74,9 +73,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			return 
 		}
 		
-		//성공시 PDF형태로출력
-		res.Header().Set("Content-Type", "application/pdf")
-		res.Write(pdfBuffer)
 		return 
 		
 	}else{

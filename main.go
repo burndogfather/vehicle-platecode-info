@@ -54,7 +54,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		taskCtx, cancel := chromedp.NewContext(
 			context.Background(),
 			chromedp.WithLogf(log.Printf),
-			//chromedp.WithProxyServer(proxy),
+			chromedp.WithProxyServer(`http://59.10.241.129:8080`),
 		)
 		defer cancel()
 		

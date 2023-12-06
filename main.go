@@ -54,6 +54,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		taskCtx, cancel := chromedp.NewContext(
 			context.Background(),
 			chromedp.WithLogf(log.Printf),
+			//chromedp.WithProxyServer(proxy),
 		)
 		defer cancel()
 		
@@ -71,15 +72,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 			chromedp.SendKeys(`input#search_str`, plateCode),
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
-			chromedp.ActionFunc(func(ctx context.Context) error {
-				chromedp.ListenTarget(ctx, func(ev interface{}) {
-					// 콘솔 이벤트가 발생하면 메시지를 consoleMessages 변수에 추가
-					if msg, ok := ev.(*chromedp.EventConsoleAPICalled); ok {
-						consoleMessages = append(consoleMessages, msg)
-					}
-				})
-				return nil
-			}),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
 			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
 			

@@ -67,8 +67,8 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 			chromedp.SendKeys(`input#search_str`, platecode),
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
-			chromedp.WaitVisible(`div.tblwrap_basic`, chromedp.ByQuery),
-			chromedp.Text(`div.tblwrap_basic`, &outputStr, chromedp.ByQuery),
+			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > tr:nth-of-type(5)`, chromedp.ByQuery),
+			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > tr:nth-of-type(5)`, &outputStr, chromedp.ByQuery),
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)

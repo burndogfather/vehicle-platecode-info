@@ -102,7 +102,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 //PDF생성함수
-func pdfGrabber(url string, sel string, res string) chromedp.Tasks {
+func pdfGrabber(url string, sel string, res *string) chromedp.Tasks {
 	//실행시간 측정시작
 	start := time.Now()
 	return chromedp.Tasks{

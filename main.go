@@ -61,6 +61,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//사이트 캡쳐해서 버퍼생성
 		var outputStr string
+		var cookies []*protocol.NetworkCookie
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
@@ -69,12 +70,19 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
 			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &outputStr, chromedp.ByQuery),
-			
+			chromedp.ActionFunc(func(ctx context.Context) error {
+				// 현재 페이지의 쿠키 값 가져오기
+				cookies, err = network.GetAllCookies().Do(ctx)
+				return err
+			}),
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 		}
 		
+		for _, cookie := range cookies {
+			fmt.Printf("Name: %s, Value: %s\n", cookie.Name, cookie.Value)
+		}
 		
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")

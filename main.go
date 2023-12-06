@@ -13,9 +13,9 @@ import (
 //메인함수
 func main() {
 	
-	//8000번 포트로 http 서버열기
-	//nginx연결됨 (https://git.coco.sqs.kr/proxy-8000)
-	err := http.ListenAndServe(":8000", http.HandlerFunc(requestHandler))
+	//8001번 포트로 http 서버열기
+	//nginx연결됨 (https://git.coco.sqs.kr/proxy-8001)
+	err := http.ListenAndServe(":8001", http.HandlerFunc(requestHandler))
 	if err != nil {
 		//http 서버 실행실패시 에러처리
 		log.Println("Failed to ListenAndServe : ", err)

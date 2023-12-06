@@ -7,7 +7,6 @@ import (
 	"time"
 	"fmt"
 	"github.com/chromedp/cdproto/emulation"
-	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 )
 
@@ -63,7 +62,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//사이트 캡쳐해서 버퍼생성
 		var outputStr string
-		if err := chromedp.Run(taskCtx, pdfGrabber("https://www.google.co.kr", "body", &outputStr)); err != nil {
+		if err := chromedp.Run(taskCtx, pdfGrabber("https://www.google.co.kr", "body", *outputStr)); err != nil {
 			//실패시 fail출력
 			res.Header().Set("Content-Type", "application/json")
 			resdata["status"] = "fail"

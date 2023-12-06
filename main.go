@@ -60,19 +60,15 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		defer cancel()
 		
 		//사이트 캡쳐해서 버퍼생성
-		
+		var outputStr string
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
-			chromedp.Navigate(`https://pkg.dadolcorp.com/test/multiselect_multi`),
-			chromedp.WaitVisible(`body`, chromedp.ByQuery),
-		)
-		if err != nil {
-			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
-		}
-		
-		var outputStr string
-		err = chromedp.Run(taskCtx,
-			chromedp.Title(&outputStr),
+			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
+			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
+			chromedp.SendKeys(`input#search_str`, platecode),
+			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
+			chromedp.WaitVisible(`div.tblwrap_basic`, chromedp.ByQuery),
+			chromedp.Text(`div.tblwrap_basic`, &outputStr, chromedp.ByQuery),
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)

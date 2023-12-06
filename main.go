@@ -40,7 +40,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	//FORM > POST 데이터 가져오기
 	req.ParseForm()
 	postdata := req.PostForm
-	fmt.Println(postdata);
 	
 	//POST 데이터에서 url이라는 값을 찾아서 String을 벗기기(?)
 	if ( postdata["platecode"] != nil){ 
@@ -66,11 +65,13 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			emulation.SetUserAgentOverride("WebScraper 1.0"), //USER AGENT설정
 			chromedp.Navigate("https://www.google.co.kr"),
 			chromedp.WaitVisible("body", chromedp.ByQuery),
-			chromedp.InnerHTML(`body`, &outputStr),
+			chromedp.Value(`body`, &outputStr),
 		)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 		}
+		
+		fmt.Println(outputStr)
 		
 		//성공시 PDF형태로출력
 		res.Header().Set("Content-Type", "application/json")

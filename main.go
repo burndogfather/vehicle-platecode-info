@@ -43,10 +43,9 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	if ( postdata["platecode"] != nil){ 
 		
 		//Map풀기
-		platecode := postdata["platecode"][0]
+		//platecode := postdata["platecode"][0]
 		
 		url := 'https://golang.org/pkg/fmt/';
-		url := fmt.Sprintf("%s?platecode=%s", url, platecode)
 		
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
@@ -69,7 +68,16 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(strVar)
+		//실패시 fail출력
+		res.Header().Set("Content-Type", "application/json")
+		resdata["status"] = "fail"
+		resdata["errormsg"] = "Parameter ERROR!"
+		output, err := json.Marshal(resdata)
+		if err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+		res.Write(strVar)
+		return 
 		
 	}else{
 		//실패시 fail출력

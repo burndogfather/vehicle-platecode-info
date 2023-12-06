@@ -64,9 +64,11 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.Text("#result-stats", &strVar),
 		)
 		
-		//실패시 fail출력
+		//성공 출력
 		res.Header().Set("Content-Type", "application/json")
-		output, err := json.Marshal(strVar)
+		resdata["status"] = "success"
+		resdata["info"] = strVar
+		output, err := json.Marshal(resdata)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 		}

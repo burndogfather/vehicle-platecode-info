@@ -113,5 +113,6 @@ func networkData(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return res.Value, nil
+
+	return res.String(), nil
 }

@@ -68,7 +68,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.Value(`main.html_here > input#test3`, &outputStr),
 		)
 		if err != nil {
-			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 		}
 		
 		fmt.Println(outputStr)

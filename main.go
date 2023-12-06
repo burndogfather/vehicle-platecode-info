@@ -72,18 +72,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		}
 		
 		fmt.Println(outputStr)
-		
-		//성공시 PDF형태로출력
-		/*
-		res.Header().Set("Content-Type", "application/json")
-		resdata["status"] = "success"
-		resdata["data"] = outputStr
-		output, err := json.Marshal(resdata)
-		if err != nil {
-			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-		}
-		res.Write(output)
-		*/
 		return 
 		
 	}else{

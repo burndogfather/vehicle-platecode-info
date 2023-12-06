@@ -61,8 +61,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		var strVar string
 		err := chromedp.Run(taskCtx,
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
-			chromedp.WaitVisible(`body > footer`),
-			chromedp.Text(`.search_title`, &strVar),
+			chromedp.OuterHTML("html", &strVar, chromedp.ByQuery),
 		)
 		
 		fmt.Println(strVar)

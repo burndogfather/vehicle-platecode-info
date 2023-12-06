@@ -6,6 +6,8 @@ import (
 	"log"
 	"fmt"
 	"time"
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 )
 
@@ -48,8 +50,12 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		fmt.Println(platecode)
 		
 		//Chromedp설정
+		opts := append(chromedp.DefaultExecAllocatorOptions[:],
+			chromedp.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"))
+		allocCtx, cancelCtx := chromedp.NewExecAllocator(context.Background(), opts...)
+		defer cancelCtx()
 		taskCtx, cancel := chromedp.NewContext(
-			context.Background(),
+			allocCtx,
 			chromedp.WithLogf(log.Printf),
 		)
 		defer cancel()

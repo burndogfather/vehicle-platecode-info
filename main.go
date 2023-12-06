@@ -63,9 +63,9 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		var outputStr string
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride("WebScraper 1.0"), //USER AGENT설정
-			chromedp.Navigate("https://www.google.co.kr"),
+			chromedp.Navigate("https://pkg.dadolcorp.com/test/multiselect_multi"),
 			chromedp.WaitVisible("body", chromedp.ByQuery),
-			chromedp.Value(`body`, &outputStr),
+			chromedp.Value(`main.html_here > input#test3`, &outputStr),
 		)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)

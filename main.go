@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"context"
 	"log"
+	"fmt"
 	"time"
 	"github.com/chromedp/chromedp"
 )
@@ -43,8 +44,8 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	if ( postdata["platecode"] != nil){ 
 		
 		//Map풀기
-		//platecode := postdata["platecode"][0]
-		
+		platecode := postdata["platecode"][0]
+		fmt.Println(platecode)
 		
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
@@ -63,6 +64,8 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.WaitVisible(`body > footer`),
 			chromedp.Text(`.search_title`, &strVar),
 		)
+		
+		fmt.Println(strVar)
 		
 		//성공 출력
 		res.Header().Set("Content-Type", "application/json")

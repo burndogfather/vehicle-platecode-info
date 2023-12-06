@@ -57,7 +57,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		defer cancel()
 		
 		var strVar string
-		err := chromedp.Run(contextVar,
+		err := chromedp.Run(taskCtx,
 			chromedp.Navigate("https://golang.org/pkg/fmt/"),
 			chromedp.WaitVisible("body > footer"),
 			chromedp.Click("#pkg-examples > div", chromedp.NodeVisible),

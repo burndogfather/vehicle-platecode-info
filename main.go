@@ -45,7 +45,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		//Map풀기
 		//platecode := postdata["platecode"][0]
 		
-		url := 'https://golang.org/pkg/fmt/';
+		var url = 'https://golang.org/pkg/fmt/';
 		
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(

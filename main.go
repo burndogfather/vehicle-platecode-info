@@ -102,22 +102,12 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 //PDF생성함수
-func pdfGrabber(url string, sel string, res *string) chromedp.Tasks {
-	//실행시간 측정시작
-	start := time.Now()
+func pdfGrabber(url string, sel string, res string) chromedp.Tasks {
+	
 	return chromedp.Tasks{
 		emulation.SetUserAgentOverride("WebScraper 1.0"), //USER AGENT설정
 		chromedp.Navigate(url),
 		chromedp.WaitVisible(sel, chromedp.ByQuery),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			buf, _, err := page.PrintToPDF().WithPrintBackground(true).Do(ctx)
-			if err != nil {
-				return err
-			}
-			*res = buf
-			//실행시간 측정종료
-			log.Printf("\n%s | %f secs\n",url, time.Since(start).Seconds())
-			return nil
-		}),
+		chromedp.InnerHTML(`body`, &res),
 	}
 }

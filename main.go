@@ -39,31 +39,51 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	postdata := req.PostForm
 	
-	//Chromedp설정
-	taskCtx, cancel := chromedp.NewContext(
-		context.Background(),
-		chromedp.WithLogf(log.Printf),
-	)
-	defer cancel()
-	
-	//최대 대기시간은 15초
-	taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
-	defer cancel()
-	
-	var strVar string
-	err := chromedp.Run(taskCtx,
-		chromedp.Navigate("https://golang.org/pkg/fmt/"),
-		chromedp.WaitVisible("body > footer"),
-		chromedp.Click("#pkg-examples > div", chromedp.NodeVisible),
-		chromedp.Value("#example_Println .play .input textarea", &strVar),
-	)
-	
-	//실패시 fail출력
-	res.Header().Set("Content-Type", "application/json")
-	output, err := json.Marshal(strVar)
-	if err != nil {
-		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+	//POST 데이터에서 차량번호 값을 찾아서 String을 벗기기(?)
+	if ( postdata["platecode"] != nil){ 
+		
+		//Map풀기
+		//platecode := postdata["platecode"][0]
+		
+		
+		//Chromedp설정
+		taskCtx, cancel := chromedp.NewContext(
+			context.Background(),
+			chromedp.WithLogf(log.Printf),
+		)
+		defer cancel()
+		
+		//최대 대기시간은 15초
+		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
+		defer cancel()
+		
+		var strVar string
+		err := chromedp.Run(taskCtx,
+			chromedp.Navigate("https://golang.org/pkg/fmt/"),
+			chromedp.WaitVisible("body > footer"),
+			chromedp.Click("#pkg-examples > div", chromedp.NodeVisible),
+			chromedp.Value("#example_Println .play .input textarea", &strVar),
+		)
+		
+		//실패시 fail출력
+		res.Header().Set("Content-Type", "application/json")
+		output, err := json.Marshal(strVar)
+		if err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+		res.Write(output)
+		return 
+		
+	}else{
+		//실패시 fail출력
+		res.Header().Set("Content-Type", "application/json")
+		resdata["status"] = "fail"
+		resdata["errormsg"] = "Parameter ERROR!"
+		output, err := json.Marshal(resdata)
+		if err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+		res.Write(output)
+		return 
 	}
-	res.Write(output)
-	return 
 }

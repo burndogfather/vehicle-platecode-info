@@ -65,18 +65,14 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.Click("#pkg-examples > div", chromedp.NodeVisible),
 			chromedp.Value("#example_Println .play .input textarea", &strVar),
 		)
-		if err != nil {
-			panic(err)
-		}
+		
 		//실패시 fail출력
 		res.Header().Set("Content-Type", "application/json")
-		resdata["status"] = "fail"
-		resdata["errormsg"] = "Parameter ERROR!"
-		output, err := json.Marshal(resdata)
+		output, err := json.Marshal(strVar)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 		}
-		res.Write(strVar)
+		res.Write(output)
 		return 
 		
 	}else{

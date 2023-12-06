@@ -61,7 +61,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		err := chromedp.Run(taskCtx,
 			chromedp.Navigate("https://www.google.com/search?q=test"),
 			chromedp.WaitVisible("body"),
-			chromedp.Value("#result-stats", &strVar),
+			chromedp.Text("#result-stats", &strVar),
 		)
 		
 		//실패시 fail출력

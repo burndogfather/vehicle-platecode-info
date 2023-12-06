@@ -7,7 +7,6 @@ import (
 	"time"
 	"fmt"
 	
-	"github.com/chromedp/cdproto/storage"
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
 )
@@ -71,36 +70,16 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
 			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &outputStr, chromedp.ByQuery),
-			chromedp.ActionFunc(func(ctx context.Context) error {
-				cookies, err := storage.GetCookies().Do(ctx)
 			
-				var c []string
-				for _, v := range cookies {
-					aCookie := v.Name + " - " + v.Domain
-					c = append(c, aCookie)
-				}
-			
-				stringSlices := strings.Join(c[:], ",\n")
-				fmt.Printf("%v", stringSlices)
-			
-				if err != nil {
-					return err
-				}
-				return nil
-			}),
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 		}
 		
-		for _, cookie := range cookies {
-			fmt.Printf("Name: %s, Value: %s\n", cookie.Name, cookie.Value)
-		}
-		
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "success"
-		resdata["data"] = outputStr
+		resdata["data"]["price"] = outputStr
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)

@@ -5,8 +5,7 @@ import (
 	"context"
 	"log"
 	"time"
-	"github.com/chromedp/cdproto/emulation"
-	"github.com/chromedp/cdproto/page"
+	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
 )
 
@@ -73,6 +72,9 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			return 
 		}
 		
+		//성공시 PDF형태로출력
+		res.Header().Set("Content-Type", "application/pdf")
+		res.Write(pdfBuffer)
 		return 
 		
 	}else{

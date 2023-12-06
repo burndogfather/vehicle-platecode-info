@@ -46,8 +46,8 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	if ( postdata["platecode"] != nil){ 
 		
 		//Map풀기
-		platecode := postdata["platecode"][0]
-		fmt.Println(platecode)
+		plateCode := postdata["platecode"][0]
+		fmt.Println(plateCode)
 		
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
@@ -61,26 +61,41 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		defer cancel()
 		
 		//사이트 캡쳐해서 버퍼생성
-		var outputStr string
+		var carPrice string
+		var consoleMessages []*chromedp.ConsoleMessage
+
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
-			chromedp.SendKeys(`input#search_str`, platecode),
+			chromedp.SendKeys(`input#search_str`, plateCode),
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
+			chromedp.ActionFunc(func(ctx context.Context) error {
+				chromedp.ListenTarget(ctx, func(ev interface{}) {
+					// 콘솔 이벤트가 발생하면 메시지를 consoleMessages 변수에 추가
+					if msg, ok := ev.(*chromedp.EventConsoleAPICalled); ok {
+						consoleMessages = append(consoleMessages, msg)
+					}
+				})
+				return nil
+			}),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
-			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &outputStr, chromedp.ByQuery),
+			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
 			
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 		}
 		
+		for _, msg := range consoleMessages {
+			log.Println("Console message:", msg.Text)
+		}
+		
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "success"
-		resdata["platecode"] = platecode
-		resdata["price"] = outputStr
+		resdata["platecode"] = plateCode
+		resdata["price"] = carPrice
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)

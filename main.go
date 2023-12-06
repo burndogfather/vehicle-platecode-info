@@ -5,7 +5,6 @@ import (
 	"context"
 	"log"
 	"time"
-	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
 )
 
@@ -57,25 +56,17 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
 		defer cancel()
 		
-		//사이트 캡쳐해서 버퍼생성
-		var pdfBuffer []byte
-		if err := chromedp.Run(taskCtx, pdfGrabber(url, element, &pdfBuffer)); err != nil {
-			//실패시 fail출력
-			res.Header().Set("Content-Type", "application/json")
-			resdata["status"] = "fail"
-			resdata["errormsg"] = err.Error()
-			output, err := json.Marshal(resdata)
-			if err != nil {
-				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-			}
-			res.Write(output)
-			return 
+		var strVar string
+		err := chromedp.Run(contextVar,
+			chromedp.Navigate("https://golang.org/pkg/fmt/"),
+			chromedp.WaitVisible("body > footer"),
+			chromedp.Click("#pkg-examples > div", chromedp.NodeVisible),
+			chromedp.Value("#example_Println .play .input textarea", &strVar),
+		)
+		if err != nil {
+			panic(err)
 		}
-		
-		//성공시 PDF형태로출력
-		res.Header().Set("Content-Type", "application/pdf")
-		res.Write(pdfBuffer)
-		return 
+		fmt.Println(strVar)
 		
 	}else{
 		//실패시 fail출력
@@ -88,26 +79,5 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		}
 		res.Write(output)
 		return 
-	}
-}
-
-//PDF생성함수
-func pdfGrabber(url string, sel string, res *[]byte) chromedp.Tasks {
-	//실행시간 측정시작
-	start := time.Now()
-	return chromedp.Tasks{
-		emulation.SetUserAgentOverride("WebScraper 1.0"), //USER AGENT설정
-		chromedp.Navigate(url),
-		chromedp.WaitVisible(sel, chromedp.ByQuery),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			buf, _, err := page.PrintToPDF().WithPrintBackground(true).Do(ctx)
-			if err != nil {
-				return err
-			}
-			*res = buf
-			//실행시간 측정종료
-			log.Printf("\n%s | %f secs\n",url, time.Since(start).Seconds())
-			return nil
-		}),
 	}
 }

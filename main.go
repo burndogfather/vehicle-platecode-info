@@ -69,14 +69,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
 			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &outputStr, chromedp.ByQuery),
-			chromedp.ActionFunc(func(ctx context.Context) error {
-				res, err := networkData(ctx)
-				if err != nil {
-					return err
-				}
-				fmt.Println(res)
-				return nil
-			}),
+			
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
@@ -106,13 +99,4 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		res.Write(output)
 		return 
 	}
-}
-
-func networkData(ctx context.Context) (string, error) {
-	res, err := chromedp.EvaluateAsDevTools(`JSON.stringify(window.performance.getEntriesByType("resource"))`, chromedp.EvalAsValue)
-	if err != nil {
-		return "", err
-	}
-
-	return res.String(), nil
 }

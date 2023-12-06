@@ -54,15 +54,14 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		defer cancel()
 		
 		//최대 대기시간은 15초
-		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
+		taskCtx, cancel = context.WithTimeout(taskCtx, 5*time.Second)
 		defer cancel()
 		
 		var strVar string
 		err := chromedp.Run(taskCtx,
-			chromedp.Navigate("https://golang.org/pkg/fmt/"),
+			chromedp.Navigate("https://pkg.go.dev/fmt"),
 			chromedp.WaitVisible("body > footer"),
-			chromedp.Click("#pkg-examples > div", chromedp.NodeVisible),
-			chromedp.Value("#example_Println .play .input textarea", &strVar),
+			chromedp.Value("#hdr-Printing", &strVar),
 		)
 		
 		//실패시 fail출력

@@ -59,9 +59,9 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		var strVar string
 		err := chromedp.Run(taskCtx,
-			chromedp.Navigate("https://www.google.com/search?q=test"),
-			chromedp.WaitVisible("body"),
-			chromedp.Text("#result-stats", &strVar),
+			chromedp.Navigate('https://www.car365.go.kr/web/contents/websold_vehicle.do'),
+			chromedp.WaitVisible("body > footer"),
+			chromedp.Text(".search_title", &strVar),
 		)
 		
 		//성공 출력

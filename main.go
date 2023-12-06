@@ -79,7 +79,8 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "success"
-		resdata["data"]["price"] = outputStr
+		resdata["platecode"] = platecode
+		resdata["price"] = outputStr
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)

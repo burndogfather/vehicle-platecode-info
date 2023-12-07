@@ -61,12 +61,18 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//사이트 캡쳐해서 버퍼생성
 		var carPrice string
-		var networkData []byte
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 			chromedp.SendKeys(`input#search_str`, plateCode),
+			chromedp.ActionFunc(func(taskCtx context.Context) error {
+				err := chromedp.RuntimeEnable().Do(taskCtx)
+				if err != nil {
+					return err
+				}
+				return chromedp.LogEnable().Do(taskCtx)
+			}),
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
 			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
@@ -74,6 +80,27 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
+		}
+		
+		
+		var consoleMessages []string
+		err = chromedp.Run(taskCtx,
+			chromedp.ActionFunc(func(taskCtx context.Context) error {
+				chromedp.ListenTarget(taskCtx, func(ev interface{}) {
+					if msg, ok := ev.(*chromedp.LogEntry); ok {
+						consoleMessages = append(consoleMessages, msg.Message)
+					}
+				})
+				return nil
+			}),
+			chromedp.Sleep(5 * time.Second), // Wait for some time to capture console messages
+		)
+		if err != nil {
+			log.Fatal(err)
+		}
+		
+		for _, msg := range consoleMessages {
+			log.Println("Console Message:", msg)
 		}
 		
 		

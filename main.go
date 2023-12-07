@@ -7,9 +7,6 @@ import (
 	"time"
 	"fmt"
 	
-	"github.com/chromedp/cdproto/cdp"
-	"github.com/chromedp/cdproto/runtime"
-	_"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
 )
@@ -64,37 +61,24 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//사이트 캡쳐해서 버퍼생성
 		var carPrice string
-		var networkData []byte
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
-			
-			chromedp.ActionFunc(func(ctx context.Context) error {
-				_, err := chromedp.NetworkEnable().Do(ctx)
-				return err
+			chromedp.WaitEvent(`window.load`, func(event chromedp.Event) {
+				fmt.Printf("%+v\n", event)
+				return nil
 			}),
-			
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 			chromedp.SendKeys(`input#search_str`, plateCode),
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
 			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
 			
-			chromedp.ActionFunc(func(ctx context.Context) error {
-				eventData, err := chromedp.NetworkGetResponseBody("",
-					chromedp.NetworkGetResponseBodyOptions{}).Do(ctx)
-				if err != nil {
-					return err
-				}
-				networkData = eventData.Body
-				return nil
-			}),
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 		}
 		
-		fmt.Printf("Network Data: %s\n", networkData)
 		
 		
 		//성공시 출력

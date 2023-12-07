@@ -1,11 +1,10 @@
-package vehicleplatecode
+package main
 import (
 	"net/http"
 	"encoding/json"
 	"context"
 	"log"
 	"time"
-	"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"

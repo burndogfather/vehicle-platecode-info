@@ -67,7 +67,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 			chromedp.SendKeys(`input#search_str`, plateCode),
-			chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, &resConsole, chromedp.EvalAsValue),
+			chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, &resConsole),
 			//chromedp.Click(`a#search_btn`, chromedp.ByQuery),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
 			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),

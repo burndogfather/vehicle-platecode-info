@@ -67,12 +67,12 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
-			chromedp.ActionFunc(func(taskCtx context.Context) error {
-				err := chromedp.RuntimeEnable().Do(taskCtx)
+			chromedp.ActionFunc(func(ctx context.Context) error {
+				err := chromedp.RuntimeEnable().Do(ctx)
 				if err != nil {
 					return err
 				}
-				return chromedp.LogEnable().Do(taskCtx)
+				return chromedp.LogEnable().Do(ctx)
 			}),
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 			chromedp.SendKeys(`input#search_str`, plateCode),

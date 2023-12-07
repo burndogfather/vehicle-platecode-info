@@ -63,38 +63,19 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		var carPrice string
 		var networkData []byte
 		err := chromedp.Run(taskCtx,
-			chromedp.ActionFunc(func(ctxt context.Context, h cdptypes.Handler) error {
-				go func() {
-					echan := h.Listen(cdptypes.EventNetworkRequestWillBeSent, cdptypes.EventNetworkLoadingFinished)
-					for d := range echan {
-						switch d.(type) {
-						case *network.EventRequestWillBeSent:
-							req := d.(*network.EventRequestWillBeSent)
-							if strings.HasSuffix(req.Request.URL, "/data_I_want.js") {
-								reqId1 = req.RequestID
-							} else if strings.HasSuffix(req.Request.URL, "/another_one.js") {
-								reqId2 = req.RequestID
-							}
-						case *network.EventLoadingFinished:
-							res := d.(*network.EventLoadingFinished)
-							var data []byte
-							var e error
-							if reqId1 == res.RequestID {
-								data, e = network.GetResponseBody(reqId1).Do(ctxt, h)
-							} else if reqId2 == res.RequestID {
-								data, e = network.GetResponseBody(reqId2).Do(ctxt, h)
-							}
-							if e != nil {
-								panic(e)
-							}
-							if len(data) > 0 {
-								fmt.Printf("=========data: %+v\n", string(data))
-							}
-						}
+			chromedp.ListenTarget(
+				taskCtx,
+				func(ev interface{}){
+					if ev, ok := ev.(*network.EventResponseReceived); ok {
+						fmt.Println("event received:")
+						fmt.Println(ev.Type)
+						var len = ev.Response.EncodedDataLength;
+						fmt.Println(ev.Response.URL + ":" + fmt.Sprintf("%f", len))
+						return
+			
 					}
-				}()
-				return nil
-			}),
+				},
+			),
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),

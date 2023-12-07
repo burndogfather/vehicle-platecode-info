@@ -79,6 +79,24 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		}
 		
 		
+		//네트워크 데이터 수집
+		var networkData []byte
+		err = chromedp.Run(taskCtx,
+			chromedp.ActionFunc(func(ctx context.Context) error {
+				data, err := chromedp.NetworkGetResponseBody("",
+					chromedp.NetworkGetResponseBodyOptions{}).Do(ctx)
+				if err != nil {
+					return err
+				}
+				networkData = data
+				return nil
+			}),
+		)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Network Data: %s\n", networkData)
+		
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "success"

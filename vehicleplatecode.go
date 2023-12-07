@@ -5,6 +5,7 @@ import (
 	"context"
 	"log"
 	"time"
+	"strings"
 	
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
@@ -78,11 +79,26 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		)
 		if err != nil {
 			//log.Fatalf("Error happened in ChromeDP. Err: %s", err)
+			return
 		}
 		
+		if strings.Compare(carName, "") == 0 {
+			//실패시 fail출력
+			res.Header().Set("Content-Type", "application/json")
+			resdata["is_success"] = 0
+			resdata["status"] = "fail"
+			resdata["errormsg"] = "차량번호를 찾을 수 없습니다"
+			output, err := json.Marshal(resdata)
+			if err != nil {
+				//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+			res.Write(output)
+			return 
+		}
 		
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")
+		resdata["is_success"] = 1
 		resdata["status"] = "success"
 		resdata["platecode"] = plateCode
 		resdata["name"] = carName
@@ -99,8 +115,9 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	}else{
 		//실패시 fail출력
 		res.Header().Set("Content-Type", "application/json")
+		resdata["is_success"] = 0
 		resdata["status"] = "fail"
-		resdata["errormsg"] = "Parameter ERROR!"
+		resdata["errormsg"] = "잘못된 데이터 입력입니다"
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)

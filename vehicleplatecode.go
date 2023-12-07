@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 	"strings"
+	"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
@@ -47,6 +48,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//Map풀기
 		plateCode := postdata["platecode"][0]
+		fmt.Println(plateCode);
 		
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
@@ -78,11 +80,13 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			
 		)
 		if err != nil {
+			fmt.Println(err);
 			//log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 			return
 		}
 		
 		if strings.Compare(carName, "") == 0 {
+			fmt.Println("실패!");
 			//실패시 fail출력
 			res.Header().Set("Content-Type", "application/json")
 			resdata["status"] = "fail"

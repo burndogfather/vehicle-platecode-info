@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 	"strings"
-	"fmt"
+	//"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
@@ -48,7 +48,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//Map풀기
 		plateCode := postdata["platecode"][0]
-		fmt.Println(plateCode);
+		//fmt.Println(plateCode);
 		
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(

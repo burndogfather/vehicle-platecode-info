@@ -60,7 +60,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
 		defer cancel()
 		
-		go crawling(taskCtx, plateCode, res)
+		crawling(taskCtx, plateCode, res)
 		
 		
 	}else{

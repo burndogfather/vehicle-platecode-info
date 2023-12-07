@@ -1,4 +1,4 @@
-package main
+package vehicleplatecode
 import (
 	"net/http"
 	"encoding/json"
@@ -47,7 +47,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//Map풀기
 		plateCode := postdata["platecode"][0]
-		fmt.Println(plateCode)
 		
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
@@ -56,7 +55,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		defer cancel()
 		
 		//최대 대기시간은 15초
-		taskCtx, cancel = context.WithTimeout(taskCtx, 5*time.Second)
+		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
 		defer cancel()
 		
 		//사이트 캡쳐해서 버퍼생성

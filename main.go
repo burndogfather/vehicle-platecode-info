@@ -82,7 +82,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		resdata["status"] = "success"
 		resdata["platecode"] = plateCode
 		resdata["price"] = carPrice
-		resdata["test"] = resConsole
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)

@@ -7,6 +7,7 @@ import (
 	"time"
 	"fmt"
 	
+	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
 )
@@ -71,7 +72,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 				if err != nil {
 					return err
 				}
-				return chromedp.LogEnable().Do(taskCtx)
+				return nil
 			}),
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
@@ -82,13 +83,16 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 		}
 		
-		
 		var consoleMessages []string
 		err = chromedp.Run(taskCtx,
 			chromedp.ActionFunc(func(taskCtx context.Context) error {
 				chromedp.ListenTarget(taskCtx, func(ev interface{}) {
-					if msg, ok := ev.(*chromedp.LogEntry); ok {
-						consoleMessages = append(consoleMessages, msg.Message)
+					if msg, ok := ev.(*runtime.EventConsoleAPICalled); ok {
+						for _, arg := range msg.Args {
+							if arg.Type == runtime.TypeString {
+								consoleMessages = append(consoleMessages, arg.Value.(string))
+							}
+						}
 					}
 				})
 				return nil
@@ -100,7 +104,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		}
 		
 		for _, msg := range consoleMessages {
-			log.Println("Console Message:", msg)
+			fmt.Println("Console Message:", msg)
 		}
 		
 		

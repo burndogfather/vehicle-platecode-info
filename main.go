@@ -66,7 +66,10 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
-			
+			chromedp.WaitEvent('document.DOMContentLoaded', func(event chromedp.Event) {
+				fmt.Printf("%+v\n", event)
+				return nil
+			}),
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 			chromedp.SendKeys(`input#search_str`, plateCode),
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),

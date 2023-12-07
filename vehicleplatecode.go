@@ -2,13 +2,13 @@ package main
 import (
 	"net/http"
 	"encoding/json"
-	"context"
+	_"context"
 	"log"
-	"time"
-	"strings"
+	_"time"
+	_"strings"
 	
-	"github.com/chromedp/cdproto/emulation"
-	"github.com/chromedp/chromedp"
+	_"github.com/chromedp/cdproto/emulation"
+	_"github.com/chromedp/chromedp"
 )
 
 //메인함수
@@ -48,6 +48,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		//Map풀기
 		plateCode := postdata["platecode"][0]
 		
+		/*
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
 			context.Background(),
@@ -103,6 +104,18 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		resdata["type"] = carType
 		resdata["year"] = carYear
 		resdata["price"] = carPrice
+		output, err := json.Marshal(resdata)
+		if err != nil {
+			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+		res.Write(output)
+		return 
+		*/
+		
+		//성공시 출력
+		res.Header().Set("Content-Type", "application/json")
+		resdata["status"] = "success"
+		resdata["platecode"] = plateCode
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)

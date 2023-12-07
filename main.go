@@ -70,7 +70,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
 			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
-			chromedp.EvaluateAsDevTools("pages", &resConsole),
+			chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, &resConsole, chromedp.EvalAsValue),
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)

@@ -63,17 +63,24 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		var carPrice string
 		var networkData []byte
 		err := chromedp.Run(taskCtx,
-			chromedp.ListenTarget(
-				taskCtx,
-				func(ev interface{}){
-					if ev, ok := ev.(*network.EventResponseReceived); ok {
-						fmt.Println("event received:")
-						fmt.Println(ev.Type)
-						var len = ev.Response.EncodedDataLength;
-						fmt.Println(ev.Response.URL + ":" + fmt.Sprintf("%f", len))
-						return
-			
+			chromedp.ListenTarget(taskCtx, func(ev interface{}) {
+				switch ev := ev.(type) {
+				case *runtime.EventConsoleAPICalled:
+					fmt.Printf("* console.%s call:\n", ev.Type)
+					for _, arg := range ev.Args {
+						fmt.Printf("%s - %s\n", arg.Type, arg.Value)
 					}
+				case *runtime.EventExceptionThrown:
+					// Since ts.URL uses a random port, replace it.
+					s := ev.ExceptionDetails.Error()
+					s = strings.ReplaceAll(s, ts.URL, "<server>")
+					// V8 has changed the error messages for property access on null/undefined in version 9.3.310.
+					// see: https://chromium.googlesource.com/v8/v8/+/c0fd89c3c089e888c4f4e8582e56db7066fa779b
+					//      https://github.com/chromium/chromium/commit/1735cbf94c98c70ff7554a1e9e01bb9a4f91beb6
+					// The message is normalized to make it compatible with the versions before this change.
+					s = strings.ReplaceAll(s, "Cannot read property 'throwsException' of null", "Cannot read properties of null (reading 'throwsException')")
+					fmt.Printf("* %s\n", s)
+				}
 			}),
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),

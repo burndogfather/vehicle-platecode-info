@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	_"context"
 	"log"
-	_"time"
+	"time"
 	_"strings"
 	
 	_"github.com/chromedp/cdproto/emulation"
@@ -113,6 +113,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		*/
 		
 		//성공시 출력
+		time.Sleep(5 * time.Second)
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "success"
 		resdata["platecode"] = plateCode

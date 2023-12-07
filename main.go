@@ -7,7 +7,6 @@ import (
 	"time"
 	"fmt"
 	
-	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
 )
@@ -64,20 +63,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		var carPrice string
 		var networkData []byte
 		err := chromedp.Run(taskCtx,
-			chromedp.ListenTarget(taskCtx, func(ev interface{}) {
-				switch ev := ev.(type) {
-					case *runtime.EventConsoleAPICalled:
-						fmt.Printf("* console.%s call:\n", ev.Type)
-						for _, arg := range ev.Args {
-							fmt.Printf("%s - %s\n", arg.Type, arg.Value)
-						}
-					case *runtime.EventExceptionThrown:
-						// Since ts.URL uses a random port, replace it.
-						s := ev.ExceptionDetails.Error()
-						s = strings.ReplaceAll(s, "Cannot read property 'throwsException' of null", "Cannot read properties of null (reading 'throwsException')")
-						fmt.Printf("* %s\n", s)
-				}
-			}),
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),

@@ -62,7 +62,9 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//사이트 캡쳐해서 버퍼생성
 		var carPrice string
+		var resConsole *runtime.RemoteObject
 		err := chromedp.Run(taskCtx,
+			chromedp.EvaluateAsDevTools("pages", &resConsole),
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
@@ -83,36 +85,13 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 		}
 		
-		var consoleMessages []string
-		err = chromedp.Run(taskCtx,
-			chromedp.ActionFunc(func(taskCtx context.Context) error {
-				chromedp.ListenTarget(taskCtx, func(ev interface{}) {
-					if msg, ok := ev.(*runtime.EventConsoleAPICalled); ok {
-						for _, arg := range msg.Args {
-							if arg.Type == runtime.TypeString {
-								consoleMessages = append(consoleMessages, arg.Value.(string))
-							}
-						}
-					}
-				})
-				return nil
-			}),
-			chromedp.Sleep(5 * time.Second), // Wait for some time to capture console messages
-		)
-		if err != nil {
-			log.Fatal(err)
-		}
-		
-		for _, msg := range consoleMessages {
-			fmt.Println("Console Message:", msg)
-		}
-		
 		
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "success"
 		resdata["platecode"] = plateCode
 		resdata["price"] = carPrice
+		resdata["test"] = resConsole
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)

@@ -77,7 +77,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			
 		)
 		if err != nil {
-			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
+			//log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 		}
 		
 		
@@ -91,7 +91,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		resdata["price"] = carPrice
 		output, err := json.Marshal(resdata)
 		if err != nil {
-			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 		}
 		res.Write(output)
 		return 
@@ -103,7 +103,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		resdata["errormsg"] = "Parameter ERROR!"
 		output, err := json.Marshal(resdata)
 		if err != nil {
-			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 		}
 		res.Write(output)
 		return 

@@ -80,13 +80,19 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			
 		)
 		if err != nil {
-			fmt.Println(err);
-			//log.Fatalf("Error happened in ChromeDP. Err: %s", err)
-			return
+			//실패시 fail출력
+			res.Header().Set("Content-Type", "application/json")
+			resdata["status"] = "fail"
+			resdata["errormsg"] = "차량번호를 찾을 수 없습니다"
+			output, err := json.Marshal(resdata)
+			if err != nil {
+				//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+			res.Write(output)
+			return 
 		}
 		
 		if strings.Compare(carName, "") == 0 {
-			fmt.Println("실패!");
 			//실패시 fail출력
 			res.Header().Set("Content-Type", "application/json")
 			resdata["status"] = "fail"

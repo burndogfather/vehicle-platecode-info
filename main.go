@@ -61,7 +61,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//사이트 캡쳐해서 버퍼생성
 		var carPrice string
-		var resConsole string
+		
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
@@ -74,6 +74,11 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
+		}
+		
+		var resConsole string
+		err1 := chromedp.Run(taskCtx, chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, &resConsole, chromedp.EvalAsValue)); err1 != nil {
+			return fmt.Errorf("could not evaluate page : %v", err1)
 		}
 		
 		

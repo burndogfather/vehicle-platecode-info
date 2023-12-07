@@ -63,6 +63,38 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		var carPrice string
 		var networkData []byte
 		err := chromedp.Run(taskCtx,
+			chromedp.ActionFunc(func(ctxt context.Context, h cdptypes.Handler) error {
+				go func() {
+					echan := h.Listen(cdptypes.EventNetworkRequestWillBeSent, cdptypes.EventNetworkLoadingFinished)
+					for d := range echan {
+						switch d.(type) {
+						case *network.EventRequestWillBeSent:
+							req := d.(*network.EventRequestWillBeSent)
+							if strings.HasSuffix(req.Request.URL, "/data_I_want.js") {
+								reqId1 = req.RequestID
+							} else if strings.HasSuffix(req.Request.URL, "/another_one.js") {
+								reqId2 = req.RequestID
+							}
+						case *network.EventLoadingFinished:
+							res := d.(*network.EventLoadingFinished)
+							var data []byte
+							var e error
+							if reqId1 == res.RequestID {
+								data, e = network.GetResponseBody(reqId1).Do(ctxt, h)
+							} else if reqId2 == res.RequestID {
+								data, e = network.GetResponseBody(reqId2).Do(ctxt, h)
+							}
+							if e != nil {
+								panic(e)
+							}
+							if len(data) > 0 {
+								fmt.Printf("=========data: %+v\n", string(data))
+							}
+						}
+					}
+				}()
+				return nil
+			}),
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
@@ -70,21 +102,12 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
 			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
 			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
-			chromedp.ActionFunc(func(ctx context.Context) error {
-				eventData, err := chromedp.NetworkGetResponseBody("",
-					chromedp.NetworkGetResponseBodyOptions{}).Do(ctx)
-				if err != nil {
-					return err
-				}
-				networkData = eventData.Body
-				return nil
-			}),
+			
 		)
 		if err != nil {
 			log.Fatalf("Error happened in ChromeDP. Err: %s", err)
 		}
 		
-		fmt.Printf("Network Data: %s\n", networkData)
 		
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")

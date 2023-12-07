@@ -79,68 +79,70 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
-	
-	resdata := make(map[string]string)
-	
-	//사이트 캡쳐해서 버퍼생성
-	var carPrice string
-	var carName string
-	var carType string
-	var carYear string
-	err := chromedp.Run(ctx,
-		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
-		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
-		chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
-		chromedp.SendKeys(`input#search_str`, plateCode),
-		chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
-		//chromedp.Click(`a#search_btn`, chromedp.ByQuery),
-		chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
-		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(1)`, &carName, chromedp.ByQuery),
-		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(2)`, &carType, chromedp.ByQuery),
-		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(3)`, &carYear, chromedp.ByQuery),
-		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
+	go func() {
 		
-	)
-	if err != nil {
-		//실패시 fail출력
+		resdata := make(map[string]string)
+		
+		//사이트 캡쳐해서 버퍼생성
+		var carPrice string
+		var carName string
+		var carType string
+		var carYear string
+		err := chromedp.Run(ctx,
+			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
+			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
+			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
+			chromedp.SendKeys(`input#search_str`, plateCode),
+			chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
+			//chromedp.Click(`a#search_btn`, chromedp.ByQuery),
+			chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
+			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(1)`, &carName, chromedp.ByQuery),
+			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(2)`, &carType, chromedp.ByQuery),
+			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(3)`, &carYear, chromedp.ByQuery),
+			chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
+			
+		)
+		if err != nil {
+			//실패시 fail출력
+			res.Header().Set("Content-Type", "application/json")
+			resdata["status"] = "fail"
+			resdata["errormsg"] = "차량번호를 찾을 수 없습니다"
+			output, err := json.Marshal(resdata)
+			if err != nil {
+				//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+			res.Write(output)
+			return 
+		}
+		
+		
+		if strings.Compare(carName, "") == 0 {
+			//실패시 fail출력
+			res.Header().Set("Content-Type", "application/json")
+			resdata["status"] = "fail"
+			resdata["errormsg"] = "차량번호를 찾을 수 없습니다"
+			output, err := json.Marshal(resdata)
+			if err != nil {
+				//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+			res.Write(output)
+			return 
+		}
+		
+		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")
-		resdata["status"] = "fail"
-		resdata["errormsg"] = "차량번호를 찾을 수 없습니다"
+		resdata["status"] = "success"
+		resdata["platecode"] = plateCode
+		resdata["name"] = carName
+		resdata["type"] = carType
+		resdata["year"] = carYear
+		resdata["price"] = carPrice
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 		}
 		res.Write(output)
 		return 
-	}
-	
-	if strings.Compare(carName, "") == 0 {
-		//실패시 fail출력
-		res.Header().Set("Content-Type", "application/json")
-		resdata["status"] = "fail"
-		resdata["errormsg"] = "차량번호를 찾을 수 없습니다"
-		output, err := json.Marshal(resdata)
-		if err != nil {
-			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-		}
-		res.Write(output)
-		return 
-	}
-	
-	
-	//성공시 출력
-	res.Header().Set("Content-Type", "application/json")
-	resdata["status"] = "success"
-	resdata["platecode"] = plateCode
-	resdata["name"] = carName
-	resdata["type"] = carType
-	resdata["year"] = carYear
-	resdata["price"] = carPrice
-	output, err := json.Marshal(resdata)
-	if err != nil {
-		//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-	}
-	res.Write(output)
-	return 
-	
+		
+	}()
 }

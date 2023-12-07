@@ -7,6 +7,8 @@ import (
 	"time"
 	"fmt"
 	
+	"github.com/chromedp/cdproto/cdp"
+	"github.com/chromedp/cdproto/runtime"
 	_"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"

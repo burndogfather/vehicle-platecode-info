@@ -67,6 +67,10 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		err := chromedp.Run(taskCtx,
 			emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 			chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
+			chromedp.ActionFunc(func(taskCtx context.Context) error {
+				_, err := chromedp.NetworkEnable().Do(taskCtx)
+				return err
+			}),
 			chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 			chromedp.SendKeys(`input#search_str`, plateCode),
 			chromedp.Click(`a#search_btn`, chromedp.ByQuery),
@@ -82,20 +86,19 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		//네트워크 데이터 수집
 		var networkData []byte
 		err = chromedp.Run(taskCtx,
-			chromedp.ActionFunc(func(ctx context.Context) error {
-				data, err := chromedp.NetworkGetResponseBody("",
-					chromedp.NetworkGetResponseBodyOptions{}).Do(ctx)
+			chromedp.ActionFunc(func(taskCtx context.Context) error {
+				eventData, err := chromedp.NetworkGetResponseBody("",
+					chromedp.NetworkGetResponseBodyOptions{}).Do(taskCtx)
 				if err != nil {
 					return err
 				}
-				networkData = data
+				networkData = eventData.Body
 				return nil
 			}),
 		)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("Network Data: %s\n", networkData)
 		
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")

@@ -37,7 +37,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	
 	//반환될 Response 사전정의
 	res.WriteHeader(http.StatusCreated)
-	resdata := make(map[string]string)
+	
 	
 	//FORM > POST 데이터 가져오기
 	req.ParseForm()
@@ -66,6 +66,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	}else{
 		//실패시 fail출력
 		res.Header().Set("Content-Type", "application/json")
+		resdata := make(map[string]string)
 		resdata["status"] = "fail"
 		resdata["errormsg"] = "잘못된 데이터 입력입니다"
 		output, err := json.Marshal(resdata)
@@ -78,6 +79,8 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
+	
+	resdata := make(map[string]string)
 	
 	//사이트 캡쳐해서 버퍼생성
 	var carPrice string

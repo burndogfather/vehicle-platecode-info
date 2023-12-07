@@ -60,7 +60,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
 		defer cancel()
 		
-		crawling(taskCtx, plateCode)
+		crawling(taskCtx, plateCode, res)
 		
 		
 	}else{
@@ -77,7 +77,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func crawling(ctx context.Context, plateCode string){
+func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	
 	//사이트 캡쳐해서 버퍼생성
 	var carPrice string

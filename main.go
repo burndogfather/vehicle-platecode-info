@@ -81,6 +81,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			return fmt.Errorf("could not evaluate page : %v", err1)
 		}
 		
+		fmt.Println(resConsole)
 		
 		//성공시 출력
 		res.Header().Set("Content-Type", "application/json")

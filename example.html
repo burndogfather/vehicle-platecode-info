@@ -13,13 +13,12 @@
 			function inquiry(){
 				let platecode = document.querySelector('input[type="text"]').value;
 				console.log(platecode);
-				let formData = new FormData(form);
-				let payload = new URLSearchParams(formData);
-				
 				fetch('https://coco.sqs.kr/vehicle-platecode/',{
 					method : 'POST',
 					headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
-					body : payload,
+					body: new URLSearchParams({
+						platecode: platecode
+					})
 				}).then((response) => response.json()
 				).then((data)=>{
 					console.log(data);

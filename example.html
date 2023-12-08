@@ -51,6 +51,7 @@
 					})
 				}).then((response) => response.json()
 				).then((data)=>{
+					document.querySelector('#name').innerText(data.name);
 					console.log(data);
 				});
 				

@@ -51,7 +51,21 @@
 					})
 				}).then((response) => response.json()
 				).then((data)=>{
-					document.querySelector('#name').innerText(data.name);
+					
+					if(data.status === 'success'){
+						document.querySelector('#platecode').innerText = data.platecode;
+						document.querySelector('#name').innerText = data.name;
+						document.querySelector('#type').innerText = data.type;
+						document.querySelector('#year').innerText = data.year;
+						document.querySelector('#price').innerText = data.price;
+					}else{
+						document.querySelector('#platecode').innerText = '';
+						document.querySelector('#name').innerText = '';
+						document.querySelector('#type').innerText = '';
+						document.querySelector('#year').innerText = '';
+						document.querySelector('#price').innerText = '';
+					}
+					
 					console.log(data);
 				});
 				

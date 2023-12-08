@@ -41,8 +41,10 @@
 		
 		<script type='text/javascript'>
 			function inquiry(){
+				document.querySelector('button').setAttribute('disabled');
+				
 				let platecode = document.querySelector('input[type="text"]').value;
-				console.log(platecode);
+				
 				fetch('https://coco.sqs.kr/vehicle-platecode/',{
 					method : 'POST',
 					headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
@@ -52,6 +54,7 @@
 				}).then((response) => response.json()
 				).then((data)=>{
 					
+					document.querySelector('button').removeAttribute('disabled');
 					if(data.status === 'success'){
 						document.querySelector('#platecode').innerText = data.platecode;
 						document.querySelector('#name').innerText = data.name;

@@ -16,6 +16,7 @@
 				
 				fetch('https://coco.sqs.kr/vehicle-platecode/',{
 					method : 'POST',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
 					body : JSON.stringify({'platecode':platecode}),
 					headers: {'Content-Type': 'application/json'}
 				}).then((response) => response.json()

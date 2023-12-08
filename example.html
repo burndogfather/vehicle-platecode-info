@@ -21,7 +21,12 @@
 		<button onclick='inquiry();'>조회</button>
 		
 		<table>
-			<thead></thead>
+			<thead>
+				<colgroup>
+					<col width="100px">
+					<col width="200px">
+				</colgroup>
+			</thead>
 			<tbody>
 				<tr>
 					<td>차량번호</td>
@@ -49,7 +54,7 @@
 		
 		<script type='text/javascript'>
 			function inquiry(){
-				document.querySelector('button').setAttribute('disabled');
+				document.querySelector('button').setAttribute('disabled', 'disabled');
 				
 				let platecode = document.querySelector('input[type="text"]').value;
 				

@@ -9,7 +9,6 @@ import (
 	//"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"
-	"github.com/chromedp/chromedp/opts"
 	"github.com/chromedp/chromedp"
 )
 
@@ -59,6 +58,12 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//최대 대기시간은 15초
 		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
+		defer cancel()
+		
+		opts := append(chromedp.DefaultExecAllocatorOptions[:],
+			chromedp.Flag("headless", true),
+		)
+		taskCtx, cancel = chromedp.NewExecAllocator(taskCtx, opts...)
 		defer cancel()
 		
 		crawling(taskCtx, plateCode, res)

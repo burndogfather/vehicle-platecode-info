@@ -9,6 +9,7 @@ import (
 	//"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"
+	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
 )
 
@@ -111,7 +112,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		//실패시 fail출력
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "fail"
-		resdata["errormsg"] = err
+		resdata["errormsg"] = err.Error()
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)

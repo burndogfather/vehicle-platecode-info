@@ -50,19 +50,15 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		plateCode := postdata["platecode"][0]
 		//fmt.Println(plateCode);
 		
-		// Additional options, including disabling GPU
-		opts := append(chromedp.DefaultExecAllocatorOptions[:],
-			chromedp.Flag("disable-gpu", true),
+		//Chromedp설정
+		taskCtx, cancel := chromedp.NewContext(
+			context.Background(),
 		)
-		
-		// Create a new context with additional options
-		taskCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
 		defer cancel()
 		
 		//최대 대기시간은 15초
 		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
 		defer cancel()
-		
 		
 		crawling(taskCtx, plateCode, res)
 		

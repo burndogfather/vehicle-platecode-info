@@ -9,6 +9,7 @@ import (
 	//"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"
+	"github.com/chromedp/chromedp/opts"
 	"github.com/chromedp/chromedp"
 )
 

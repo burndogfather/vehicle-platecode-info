@@ -10,7 +10,6 @@ import (
 	
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
-	"github.com/chromedp/chromedp/opts"
 )
 
 //메인함수
@@ -59,12 +58,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//최대 대기시간은 15초
 		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
-		defer cancel()
-		
-		taskCtx, cancel = chromedp.NewContext(taskCtx, chromedp.WithExecAllocatorOptions(
-			chromedp.Flag("headless", true),
-			chromedp.Flag("disable-gpu", true),
-		))
 		defer cancel()
 		
 		crawling(taskCtx, plateCode, res)

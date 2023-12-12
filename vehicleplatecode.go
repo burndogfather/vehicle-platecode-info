@@ -60,15 +60,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
 		defer cancel()
 		
-		// Additional options, including disabling GPU
-		opts := append(chromedp.DefaultExecAllocatorOptions[:],
-			chromedp.Flag("remote-debugging-port", 9222),
-		)
-		
-		// Create a new context with additional options
-		taskCtx, cancel = chromedp.NewExecAllocator(taskCtx, opts...)
-		defer cancel()
-		
 		
 		crawling(taskCtx, plateCode, res)
 		
@@ -100,10 +91,10 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	err := chromedp.Run(ctx,
 		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
-		chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
+		//chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 		chromedp.SendKeys(`input#search_str`, plateCode),
 		chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
-		chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
+		//chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(1)`, &carName, chromedp.ByQuery),
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(2)`, &carType, chromedp.ByQuery),
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(3)`, &carYear, chromedp.ByQuery),

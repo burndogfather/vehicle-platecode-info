@@ -56,6 +56,7 @@
 		
 		<script type='text/javascript'>
 			function inquiry(){
+				document.querySelector('html').css.cursor = 'wait';
 				document.querySelector('input[type="text"]').setAttribute('disabled', 'disabled');
 				document.querySelector('button').setAttribute('disabled', 'disabled');
 				document.querySelector('button').innerText = '조회중입니다';

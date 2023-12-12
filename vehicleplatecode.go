@@ -90,6 +90,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	var carYear string
 	err := chromedp.Run(ctx,
 		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
+		chromedp.Flag("disable-gpu", true),
 		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 		chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 		chromedp.SendKeys(`input#search_str`, plateCode),

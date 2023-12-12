@@ -9,7 +9,6 @@ import (
 	//"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"
-	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
 )
 
@@ -63,7 +62,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		opts := append(chromedp.DefaultExecAllocatorOptions[:],
 			//chromedp.Flag("headless", true),
-			//chromedp.Flag("disable-gpu", true),
+			chromedp.Flag("disable-gpu", true),
 		)
 		taskCtx, cancel = chromedp.NewExecAllocator(taskCtx, opts...)
 		defer cancel()

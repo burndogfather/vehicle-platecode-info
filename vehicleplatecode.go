@@ -60,6 +60,16 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
 		defer cancel()
 		
+		// Additional options, including disabling GPU
+		opts := append(chromedp.DefaultExecAllocatorOptions[:],
+			chromedp.Flag("remote-debugging-port", 9222),
+		)
+		
+		// Create a new context with additional options
+		taskCtx, cancel = chromedp.NewExecAllocator(taskCtx, opts...)
+		defer cancel()
+		
+		
 		crawling(taskCtx, plateCode, res)
 		
 		

@@ -46,29 +46,22 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	//POST 데이터에서 url이라는 값을 찾아서 String을 벗기기(?)
 	if ( postdata["platecode"] != nil){ 
 		
-		//Map풀기
 		plateCode := postdata["platecode"][0]
-		//fmt.Println(plateCode);
-		
-		//Chromedp설정
-		taskCtx, cancel := chromedp.NewContext(
+		ctx, cancel := chromedp.NewContext(
 			context.Background(),
 		)
 		defer cancel()
 		
-		//최대 대기시간은 15초
-		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
+		ctx, cancel = context.WithTimeout(ctx, 15*time.Second)
 		defer cancel()
 		
 		opts := append(chromedp.DefaultExecAllocatorOptions[:],
-			//chromedp.Flag("headless", true),
 			chromedp.Flag("disable-gpu", true),
 		)
-		taskCtx, cancel = chromedp.NewExecAllocator(taskCtx, opts...)
+		ctx, cancel = chromedp.NewExecAllocator(ctx, opts...)
 		defer cancel()
 		
-		crawling(taskCtx, plateCode, res)
-		
+		crawling(ctx, plateCode, res)
 		
 	}else{
 		//실패시 fail출력

@@ -67,8 +67,12 @@
 					body: new URLSearchParams({
 						platecode: platecode
 					})
-				}).then((response) => response.json()
-				).then((data)=>{
+				}).then((response) => {
+					if(!response.ok){
+						  throw new Error('400 or 500 에러 발생');
+					}
+					return response.json();
+				}).then((data)=>{
 					
 					document.querySelector('button').removeAttribute('disabled');
 					document.querySelector('button').innerText = '조회!';
@@ -96,6 +100,17 @@
 					}
 					
 					console.log(data);
+				}).catch(() => {
+					
+					document.querySelector('button').removeAttribute('disabled');
+					document.querySelector('button').innerText = '조회!';
+					
+					document.querySelector('#platecode').innerText = '';
+					document.querySelector('#name').innerText = '';
+					document.querySelector('#type').innerText = '';
+					document.querySelector('#year').innerText = '';
+					document.querySelector('#price').innerText = '';
+					
 				});
 				
 			};

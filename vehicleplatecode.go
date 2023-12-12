@@ -10,6 +10,7 @@ import (
 	
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
+	"github.com/chromedp/chromedp/opts"
 )
 
 //메인함수

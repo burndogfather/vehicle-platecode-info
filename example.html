@@ -56,7 +56,7 @@
 		
 		<script type='text/javascript'>
 			function inquiry(){
-				document.querySelector('html').css.cursor = 'wait';
+				document.querySelector('html').style.cursor = 'wait';
 				document.querySelector('input[type="text"]').setAttribute('disabled', 'disabled');
 				document.querySelector('button').setAttribute('disabled', 'disabled');
 				document.querySelector('button').innerText = '조회중입니다';
@@ -76,6 +76,7 @@
 					return response.json();
 				}).then((data)=>{
 					
+					document.querySelector('html').style.cursor = 'auto';
 					document.querySelector('input[type="text"]').removeAttribute('disabled');
 					document.querySelector('button').removeAttribute('disabled');
 					document.querySelector('button').innerText = '조회!';
@@ -105,6 +106,7 @@
 					console.log(data);
 				}).catch(() => {
 					
+					document.querySelector('html').style.cursor = 'auto';
 					document.querySelector('input[type="text"]').removeAttribute('disabled');
 					document.querySelector('button').removeAttribute('disabled');
 					document.querySelector('button').innerText = '조회!';

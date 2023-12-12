@@ -62,7 +62,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		opts := append(chromedp.DefaultExecAllocatorOptions[:],
 			//chromedp.Flag("headless", true),
-			chromedp.Flag("disable-gpu", true),
+			//chromedp.Flag("disable-gpu", true),
 		)
 		taskCtx, cancel = chromedp.NewExecAllocator(taskCtx, opts...)
 		defer cancel()
@@ -111,7 +111,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		//실패시 fail출력
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "fail"
-		resdata["errormsg"] = "차량번호를 찾을 수 없습니다"
+		resdata["errormsg"] = err
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)

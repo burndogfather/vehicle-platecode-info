@@ -53,6 +53,10 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
 			context.Background(),
+			chromedp.WithExecAllocatorOptions(
+				chromedp.Flag("headless", true),
+				chromedp.Flag("disable-gpu", true),
+			),
 		)
 		defer cancel()
 		
@@ -91,16 +95,16 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 		chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
-		chromedp.Sleep(700*time.Millisecond),
+		chromedp.Sleep(50*time.Millisecond),
 		chromedp.SendKeys(`input#search_str`, plateCode),
 		chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
 		chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
-		chromedp.Sleep(700*time.Millisecond),
+		chromedp.Sleep(50*time.Millisecond),
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(1)`, &carName, chromedp.ByQuery),
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(2)`, &carType, chromedp.ByQuery),
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(3)`, &carYear, chromedp.ByQuery),
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
-		
+		chromedp.Stop(),
 	)
 	if err != nil {
 		//실패시 fail출력

@@ -53,15 +53,17 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		//Chromedp설정
 		taskCtx, cancel := chromedp.NewContext(
 			context.Background(),
-			chromedp.WithExecAllocatorOptions(
-				chromedp.Flag("headless", true),
-				chromedp.Flag("disable-gpu", true),
-			),
 		)
 		defer cancel()
 		
 		//최대 대기시간은 15초
 		taskCtx, cancel = context.WithTimeout(taskCtx, 15*time.Second)
+		defer cancel()
+		
+		taskCtx, cancel = chromedp.NewContext(taskCtx, chromedp.WithExecAllocatorOptions(
+			chromedp.Flag("headless", true),
+			chromedp.Flag("disable-gpu", true),
+		))
 		defer cancel()
 		
 		crawling(taskCtx, plateCode, res)

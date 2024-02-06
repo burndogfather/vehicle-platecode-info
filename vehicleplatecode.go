@@ -112,6 +112,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter) {
 	res.Header().Set("Content-Type", "application/json")
 	output, _ := json.Marshal(resdata)
 	res.Write(output)
+	return 
 }
 /*
 package main

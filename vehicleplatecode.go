@@ -35,6 +35,10 @@ func initChromedp() {
 
 	chromedpCtx, cancel = chromedp.NewContext(chromedpCtx)
 	defer cancel()
+	
+	//최대 대기시간은 15초
+	chromedpCtx, cancel = context.WithTimeout(chromedpCtx, 30*time.Second)
+	defer cancel()
 
 	// 컨텍스트에 대한 초기 Chrome 인스턴스 생성
 	if err := chromedp.Run(chromedpCtx); err != nil {
@@ -52,16 +56,9 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	
 	//POST 데이터에서 url이라는 값을 찾아서 String을 벗기기(?)
 	if ( postdata["platecode"] != nil){ 
-		
 		//Map풀기
 		plateCode := postdata["platecode"][0]
-
-		// 요청별 컨텍스트 생성
-		taskCtx, cancel := context.WithTimeout(chromedpCtx, 30*time.Second)
-		defer cancel()
-	
-		crawling(taskCtx, plateCode, res)
-		
+		crawling(chromedpCtx, plateCode, res)
 	}else{
 		//실패시 fail출력
 		res.Header().Set("Content-Type", "application/json")

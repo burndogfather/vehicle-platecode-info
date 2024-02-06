@@ -98,7 +98,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(1)`, &carName, chromedp.ByQuery),
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(2)`, &carType, chromedp.ByQuery),
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(3)`, &carYear, chromedp.ByQuery),
-		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery)
+		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
 	)
 	if err != nil {
 		//실패시 fail출력

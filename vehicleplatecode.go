@@ -5,7 +5,7 @@ import (
 	"context"
 	"log"
 	"time"
-	"strings"
+	//"strings"
 	//"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"

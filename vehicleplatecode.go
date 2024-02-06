@@ -10,6 +10,7 @@ import (
 	
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
+	"github.com/chromedp/chromedp/runner"
 )
 
 //메인함수
@@ -49,10 +50,24 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		plateCode := postdata["platecode"][0]
 		//fmt.Println(plateCode);
 		
-		//Chromedp설정
-		taskCtx, cancel := chromedp.NewContext(
-			context.Background(),
+		// 크롬 옵션 설정
+		opts := append(chromedp.DefaultExecAllocatorOptions[:],
+			// Headless 모드 활성화
+			runner.Flag("headless", true),
+			// GPU 가속 비활성화 (Headless 모드에서는 필요 없음)
+			runner.Flag("disable-gpu", true),
+			// 샌드박스 없이 실행 (일부 환경에서 필요할 수 있음)
+			runner.Flag("no-sandbox", true),
+			// 이미지 로딩 비활성화 (크롤링 성능 향상)
+			runner.Flag("blink-settings", "imagesEnabled=false"),
 		)
+		
+		// 커스텀 옵션을 사용하여 Allocator 컨텍스트 생성
+		taskCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+		defer cancel()
+		
+		// Allocator 컨텍스트를 사용하여 Chromedp 컨텍스트 생성
+		taskCtx, cancel := chromedp.NewContext(taskCtx)
 		defer cancel()
 		
 		//최대 대기시간은 15초

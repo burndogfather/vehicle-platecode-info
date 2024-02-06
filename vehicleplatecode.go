@@ -42,22 +42,6 @@ func main() {
 
 func requestHandler(res http.ResponseWriter, req *http.Request) {
 	// 요청 처리 로직...
-	if req.Method != "POST" {
-		http.Error(res, "Only POST method is allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// POST 데이터 파싱
-	if err := req.ParseForm(); err != nil {
-		http.Error(res, "Invalid form data", http.StatusBadRequest)
-		return
-	}
-
-	plateCode := req.FormValue("platecode")
-	if plateCode == "" {
-		http.Error(res, "Missing platecode", http.StatusBadRequest)
-		return
-	}
 	
 	//반환될 Response 사전정의
 	res.WriteHeader(http.StatusCreated)

@@ -23,7 +23,7 @@ func main() {
 	// 8001번 포트로 HTTP 서버 열기, nginx 연결됨 (https://git.coco.sqs.kr/proxy-8001)
 	err := http.ListenAndServe(":8001", http.HandlerFunc(requestHandler))
 	if err != nil {
-		log.Println("Failed to ListenAndServe:", err)
+		log.Println("Failed to ListenAndServe : ", err)
 	}
 }
 

@@ -12,39 +12,8 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-var chromedpCtx context.Context
-func initChromedpContext() {
-	
-	// 크롬 옵션 설정
-	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		// Headless 모드 활성화
-		chromedp.Flag("headless", true),
-		// GPU 가속 비활성화 (Headless 모드에서는 필요 없음)
-		chromedp.Flag("disable-gpu", true),
-		// 샌드박스 없이 실행 (일부 환경에서 필요할 수 있음)
-		chromedp.Flag("no-sandbox", true),
-		// 이미지 로딩 비활성화 (크롤링 성능 향상)
-		chromedp.Flag("blink-settings", "imagesEnabled=false"),
-	)
-	
-	// 커스텀 옵션을 사용하여 Allocator 컨텍스트 생성
-	ctx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
-	defer cancel()
-	
-	// Allocator 컨텍스트를 사용하여 Chromedp 컨텍스트 생성
-	chromedpCtx, cancel = chromedp.NewContext(ctx)
-	defer cancel()
-	
-	// 컨텍스트에 대한 초기 Chrome 인스턴스 생성
-	if err := chromedp.Run(chromedpCtx); err != nil {
-		log.Fatalf("Failed to initialize chromedp: %v", err)
-	}
-}
-
 //메인함수
 func main() {
-	
-	initChromedpContext()
 	
 	//8001번 포트로 http 서버열기
 	//nginx연결됨 (https://git.coco.sqs.kr/proxy-8001)
@@ -80,7 +49,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		plateCode := postdata["platecode"][0]
 		//fmt.Println(plateCode);
 		
-		/*
 		// 크롬 옵션 설정
 		opts := append(chromedp.DefaultExecAllocatorOptions[:],
 			// Headless 모드 활성화
@@ -101,13 +69,11 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		taskCtx, cancel = chromedp.NewContext(taskCtx)
 		defer cancel()
 		
-		*/
-		
 		//최대 대기시간은 15초
-		ctx, cancel := context.WithTimeout(chromedpCtx, 30*time.Second)
+		taskCtx, cancel = context.WithTimeout(taskCtx, 30*time.Second)
 		defer cancel()
 		
-		crawling(ctx, plateCode, res)
+		crawling(taskCtx, plateCode, res)
 		
 	}else{
 		//실패시 fail출력

@@ -88,13 +88,23 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	var carSearch string
 	err := chromedp.Run(ctx,
 		chromedp.ActionFunc(func(ctx context.Context) error {
-			// Enable network domain to control network operations
-			if err := network.Enable().Do(ctx); err != nil {
+			// 요청 가로채기 활성화
+			err := network.SetRequestInterception([]*network.RequestPattern{{
+				ResourceType: network.ResourceTypeStylesheet, // 스타일시트 요청만 가로챕니다.
+			}}).Do(ctx)
+			if err != nil {
 				return err
 			}
-			// Block URLs that end with .css
-			pattern := `*.css`
-			return network.SetBlockedURLs([]string{pattern}).Do(ctx)
+		
+			chromedp.ListenTarget(ctx, func(ev interface{}) {
+				if ev, ok := ev.(*network.EventRequestIntercepted); ok {
+					// 차단할 요청에 대해 ContinueInterceptedRequest 호출
+					c := network.ContinueInterceptedRequest(ev.InterceptionID).WithIgnore(false).WithStage(network.InterceptionStageHeadersReceived)
+					c.Do(ctx)
+				}
+			})
+		
+			return nil
 		}),
 		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),

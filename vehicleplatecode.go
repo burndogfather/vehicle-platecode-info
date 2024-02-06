@@ -7,7 +7,7 @@ import (
 	"time"
 	"strings"
 	//"fmt"
-	"github.com/chromedp/cdproto/network"
+	
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
 )
@@ -38,7 +38,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 	//반환될 Response 사전정의
 	res.WriteHeader(http.StatusCreated)
 	
-	
 	//FORM > POST 데이터 가져오기
 	req.ParseForm()
 	postdata := req.PostForm
@@ -60,9 +59,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		taskCtx, cancel = context.WithTimeout(taskCtx, 30*time.Second)
 		defer cancel()
 		
-		
 		crawling(taskCtx, plateCode, res)
-		
 		
 	}else{
 		//실패시 fail출력
@@ -86,27 +83,6 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	//사이트 캡쳐해서 버퍼생성
 	var carSearch string
 	err := chromedp.Run(ctx,
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			err := network.SetRequestInterception([]*network.RequestPattern{
-				{ResourceType: network.ResourceTypeStylesheet},
-				{ResourceType: network.ResourceTypeImage},
-				{ResourceType: network.ResourceTypeScript},
-				// 필요에 따라 더 추가
-			}).Do(ctx)
-			if err != nil {
-				return err
-			}
-		
-			chromedp.ListenTarget(ctx, func(ev interface{}) {
-				if ev, ok := ev.(*network.EventRequestIntercepted); ok {
-					go func() {
-						_ = network.ContinueInterceptedRequest(ev.InterceptionID).Do(ctx)
-					}()
-				}
-			})
-		
-			return nil
-		}),
 		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 		//chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),

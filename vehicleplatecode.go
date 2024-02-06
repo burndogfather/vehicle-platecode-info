@@ -38,9 +38,7 @@ func (e *errorString) Error() string {
 func initChromedp() {
 	// Chromedp 컨텍스트와 취소 함수 생성
 	chromedpCtx, cancelFunc = chromedp.NewExecAllocator(context.Background(), chromedp.DefaultExecAllocatorOptions[:]...)
-	chromedpCtx, cancel = chromedp.NewContext(chromedpCtx)
-	// 주의: 프로그램 종료 시 Chrome 인스턴스를 종료해야 합니다.
-	defer cancel()
+	chromedpCtx, cancelFunc = chromedp.NewContext(chromedpCtx)
 
 	// 컨텍스트에 대한 초기 Chrome 인스턴스 생성
 	if err := chromedp.Run(chromedpCtx); err != nil {
@@ -61,8 +59,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		//Map풀기
 		plateCode := postdata["platecode"][0]
 		//최대 대기시간은 15초
-		chromedpCtx, cancel = context.WithTimeout(chromedpCtx, 30*time.Second)
-		defer cancel()
+		chromedpCtx, cancelFunc = context.WithTimeout(chromedpCtx, 30*time.Second)
 		
 		crawling(chromedpCtx, plateCode, res)
 	}else{

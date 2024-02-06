@@ -37,6 +37,8 @@ func initChromedp() {
 	// Chromedp 컨텍스트와 취소 함수 생성
 	var cancel context.CancelFunc
 	chromedpCtx, cancel = chromedp.NewExecAllocator(context.Background(), chromedp.DefaultExecAllocatorOptions[:]...)
+	chromedpCtx, cancel = chromedp.NewContext(chromedpCtx)
+	// 주의: 프로그램 종료 시 Chrome 인스턴스를 종료해야 합니다.
 	defer cancel()
 
 	chromedpCtx, cancel = chromedp.NewContext(chromedpCtx)
@@ -62,6 +64,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		plateCode := postdata["platecode"][0]
 		//최대 대기시간은 15초
 		chromedpCtx, cancel = context.WithTimeout(chromedpCtx, 30*time.Second)
+		defer cancel()
 		
 		crawling(chromedpCtx, plateCode, res)
 	}else{

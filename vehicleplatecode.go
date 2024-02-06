@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
+	//"time"
 
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/cdproto/emulation"
@@ -72,7 +72,8 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		//Map풀기
 		plateCode := postdata["platecode"][0]
 		//fmt.Println(plateCode);
-		crawling(taskCtx, plateCode, res)
+		crawling(chromedpCtx, plateCode, res)
+		
 	}else{
 		//실패시 fail출력
 		res.Header().Set("Content-Type", "application/json")
@@ -92,8 +93,11 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 func crawling(ctx context.Context, plateCode string, res http.ResponseWriter) {
-	// Chromedp 작업 로직...
+	
 	var carSearch string
+	resdata := make(map[string]string)
+	
+	// Chromedp 작업 로직...
 	err := chromedp.Run(ctx,
 		emulation.SetUserAgentOverride(`Mozilla/5.0...`),
 		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),

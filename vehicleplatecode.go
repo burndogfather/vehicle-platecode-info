@@ -72,8 +72,6 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		return 
 	}
 
-	// Chromedp 작업 수행
-	crawling(chromedpCtx, plateCode, res)
 }
 
 func crawling(ctx context.Context, plateCode string, res http.ResponseWriter) {

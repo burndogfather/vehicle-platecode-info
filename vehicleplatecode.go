@@ -1,4 +1,108 @@
+package main
 
+import (
+	"context"
+	"encoding/json"
+	"log"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/chromedp/chromedp"
+	"github.com/chromedp/cdproto/emulation"
+)
+
+var chromedpCtx context.Context // 전역 Chromedp 컨텍스트
+
+func main() {
+	// Chromedp 전역 컨텍스트 초기화
+	initChromedp()
+
+	// 8001번 포트로 HTTP 서버 열기, nginx 연결됨 (https://git.coco.sqs.kr/proxy-8001)
+	err := http.ListenAndServe(":8001", http.HandlerFunc(requestHandler))
+	if err != nil {
+		log.Println("Failed to ListenAndServe:", err)
+	}
+}
+
+func initChromedp() {
+	// Chromedp 컨텍스트와 취소 함수 생성
+	var cancel context.CancelFunc
+	chromedpCtx, cancel = chromedp.NewExecAllocator(context.Background(), chromedp.DefaultExecAllocatorOptions[:]...)
+
+	// 주의: 프로그램 종료 시 Chrome 인스턴스를 종료해야 합니다.
+	defer cancel()
+
+	chromedpCtx, cancel = chromedp.NewContext(chromedpCtx)
+	defer cancel()
+
+	// 컨텍스트에 대한 초기 Chrome 인스턴스 생성
+	if err := chromedp.Run(chromedpCtx); err != nil {
+		log.Fatalf("Failed to initialize chromedp: %v", err)
+	}
+}
+
+func requestHandler(res http.ResponseWriter, req *http.Request) {
+	if req.Method != "POST" {
+		http.Error(res, "Only POST method is supported", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := req.ParseForm(); err != nil {
+		http.Error(res, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	plateCode := req.FormValue("platecode")
+	if plateCode == "" {
+		http.Error(res, "platecode is required", http.StatusBadRequest)
+		return
+	}
+
+	// 요청별 컨텍스트 생성
+	taskCtx, cancel := context.WithTimeout(chromedpCtx, 30*time.Second)
+	defer cancel()
+
+	crawling(taskCtx, plateCode, res)
+}
+
+func crawling(ctx context.Context, plateCode string, res http.ResponseWriter) {
+	var carSearch string
+	resdata := map[string]string{}
+
+	err := chromedp.Run(ctx,
+		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`),
+		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
+		chromedp.SendKeys(`input#search_str`, plateCode, chromedp.ByQuery),
+		chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
+		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data`, &carSearch, chromedp.ByQuery),
+	)
+
+	if err != nil {
+		resdata["status"] = "fail"
+		resdata["errormsg"] = err.Error()
+	} else if carSearch == "데이터가 없습니다." || carSearch == "" {
+		resdata["status"] = "fail"
+		resdata["errormsg"] = "매매사업조합에 제시/매도정보를 제공하지 않은 차량입니다"
+	} else {
+		carDetails := strings.Split(carSearch, "\t")
+		resdata["status"] = "success"
+		resdata["platecode"] = plateCode
+		resdata["name"] = carDetails[0]
+		resdata["type"] = carDetails[1]
+		resdata["year"] = carDetails[2]
+		if len(carDetails) > 4 && carDetails[4] != "" {
+			resdata["price"] = carDetails[4]
+		} else {
+			resdata["price"] = "-"
+		}
+	}
+
+	res.Header().Set("Content-Type", "application/json")
+	output, _ := json.Marshal(resdata)
+	res.Write(output)
+}
+/*
 package main
 import (
 	"net/http"
@@ -144,3 +248,5 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	return 
 	
 }
+
+*/

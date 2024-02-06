@@ -5,7 +5,7 @@ import (
 	"context"
 	"log"
 	"time"
-	//"strings"
+	"strings"
 	//"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"
@@ -112,6 +112,19 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "fail"
 		resdata["errormsg"] = err.Error()
+		output, err := json.Marshal(resdata)
+		if err != nil {
+			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+		res.Write(output)
+		return 
+	}
+	
+	if strings.Compare(carSearch, "데이터가 없습니다.") == 0 {
+		//실패시 fail출력
+		res.Header().Set("Content-Type", "application/json")
+		resdata["status"] = "fail"
+		resdata["errormsg"] = "존재하지 않는 차량번호입니다"
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)

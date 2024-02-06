@@ -130,7 +130,11 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	resdata["name"] = carDetails[0]
 	resdata["type"] = carDetails[1]
 	resdata["year"] = carDetails[2]
-	resdata["price"] = carDetails[4]
+	if len(carDetails) > 4 && carDetails[4] != "" {
+		resdata["price"] = carDetails[4]
+	} else {
+		resdata["price"] = "-"
+	}
 	output, err := json.Marshal(resdata)
 	if err != nil {
 		//log.Fatalf("Error happened in JSON marshal. Err: %s", err)

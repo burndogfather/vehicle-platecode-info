@@ -13,10 +13,12 @@ import (
 )
 
 var chromedpCtx context.Context // 전역 Chromedp 컨텍스트
+var cancelFunc context.CancelFunc
 
 func main() {
 	// Chromedp 전역 컨텍스트 초기화
 	initChromedp()
+	defer cancelFunc()
 
 	// 8001번 포트로 HTTP 서버 열기, nginx 연결됨 (https://git.coco.sqs.kr/proxy-8001)
 	err := http.ListenAndServe(":8001", http.HandlerFunc(requestHandler))
@@ -35,15 +37,11 @@ func (e *errorString) Error() string {
 
 func initChromedp() {
 	// Chromedp 컨텍스트와 취소 함수 생성
-	var cancel context.CancelFunc
-	chromedpCtx, cancel = chromedp.NewExecAllocator(context.Background(), chromedp.DefaultExecAllocatorOptions[:]...)
+	chromedpCtx, cancelFunc = chromedp.NewExecAllocator(context.Background(), chromedp.DefaultExecAllocatorOptions[:]...)
 	chromedpCtx, cancel = chromedp.NewContext(chromedpCtx)
 	// 주의: 프로그램 종료 시 Chrome 인스턴스를 종료해야 합니다.
 	defer cancel()
 
-	chromedpCtx, cancel = chromedp.NewContext(chromedpCtx)
-	defer cancel()
-	
 	// 컨텍스트에 대한 초기 Chrome 인스턴스 생성
 	if err := chromedp.Run(chromedpCtx); err != nil {
 		log.Fatalf("Failed to initialize chromedp: %v", err)

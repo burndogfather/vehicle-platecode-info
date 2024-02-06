@@ -1,4 +1,130 @@
 package main
+
+import (
+	"context"
+	"encoding/json"
+	"log"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/chromedp/chromedp"
+	"github.com/chromedp/cdproto/emulation"
+)
+
+// 전역 Chromedp 컨텍스트
+var chromedpCtx context.Context
+
+func init() {
+	// Chromedp 컨텍스트 초기화
+	var cancel context.CancelFunc
+	chromedpCtx, cancel = chromedp.NewExecAllocator(context.Background(),
+		append(chromedp.DefaultExecAllocatorOptions[:],
+			// 추가 옵션 설정 가능
+		)...,
+	)
+	chromedpCtx, cancel = chromedp.NewContext(chromedpCtx, chromedp.WithLogf(log.Printf))
+	defer cancel()
+
+	// Chrome 인스턴스 초기화
+	if err := chromedp.Run(chromedpCtx); err != nil {
+		log.Fatalf("Failed to initialize chromedp: %v", err)
+	}
+}
+
+func main() {
+	// HTTP 서버 설정
+	err := http.ListenAndServe(":8001", http.HandlerFunc(requestHandler))
+	if err != nil {
+		log.Fatalf("Failed to ListenAndServe: %v", err)
+	}
+}
+
+func requestHandler(res http.ResponseWriter, req *http.Request) {
+	// 요청 처리 로직...
+	if req.Method != "POST" {
+		http.Error(res, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// POST 데이터 파싱
+	if err := req.ParseForm(); err != nil {
+		http.Error(res, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	plateCode := req.FormValue("platecode")
+	if plateCode == "" {
+		http.Error(res, "Missing platecode", http.StatusBadRequest)
+		return
+	}
+
+	// Chromedp 작업 수행
+	crawling(chromedpCtx, plateCode, res)
+}
+
+func crawling(ctx context.Context, plateCode string, res http.ResponseWriter) {
+	// Chromedp 작업 로직...
+	var carSearch string
+	err := chromedp.Run(ctx,
+		emulation.SetUserAgentOverride(`Mozilla/5.0...`),
+		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
+		chromedp.SendKeys(`input#search_str`, plateCode, chromedp.ByQuery),
+		chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
+		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data`, &carSearch, chromedp.ByQuery),
+	)
+	// 결과 처리 로직...
+	if err != nil {
+		//실패시 fail출력
+		res.Header().Set("Content-Type", "application/json")
+		resdata["status"] = "fail"
+		resdata["errormsg"] = err.Error()
+		output, err := json.Marshal(resdata)
+		if err != nil {
+			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+		res.Write(output)
+		return 
+	}
+	if strings.Compare(carSearch, "데이터가 없습니다.") == 0 || strings.Compare(carSearch, "") == 0 {
+		//실패시 fail출력
+		res.Header().Set("Content-Type", "application/json")
+		resdata["status"] = "fail"
+		resdata["errormsg"] = "매매사업조합에 제시/매도정보를 제공하지 않은 차량입니다"
+		output, err := json.Marshal(resdata)
+		if err != nil {
+			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+		res.Write(output)
+		return 
+	}
+	
+	//탭단위 데이터로 구분하여 가져온다.
+	//"팰리세이드(PALISADE)\tLX8ABC-22-H0N\t2021\t1\t24,000,000\t-\t-"
+	carDetails := strings.Split(carSearch, "\t")
+	
+	//성공시 출력
+	res.Header().Set("Content-Type", "application/json")
+	resdata["status"] = "success"
+	resdata["platecode"] = plateCode
+	resdata["name"] = carDetails[0]
+	resdata["type"] = carDetails[1]
+	resdata["year"] = carDetails[2]
+	if len(carDetails) > 4 && carDetails[4] != "" {
+		resdata["price"] = carDetails[4]
+	} else {
+		resdata["price"] = "-"
+	}
+	output, err := json.Marshal(resdata)
+	if err != nil {
+		//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+	}
+	res.Write(output)
+	return 
+}
+
+/*
+package main
 import (
 	"net/http"
 	"encoding/json"
@@ -143,3 +269,4 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	return 
 	
 }
+*/

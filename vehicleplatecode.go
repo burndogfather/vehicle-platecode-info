@@ -84,12 +84,6 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	resdata := make(map[string]string)
 	
 	//사이트 캡쳐해서 버퍼생성
-	/*
-	var carPrice string
-	var carName string
-	var carType string
-	var carYear string
-	*/
 	var carSearch string
 	err := chromedp.Run(ctx,
 		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
@@ -97,15 +91,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		//chromedp.WaitVisible(`input#search_str`, chromedp.ByQuery),
 		chromedp.SendKeys(`input#search_str`, plateCode),
 		chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
-		//chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, chromedp.ByQuery),
-		
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data`, &carSearch, chromedp.ByQuery),
-		/*
-		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(1)`, &carName, chromedp.ByQuery),
-		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(2)`, &carType, chromedp.ByQuery),
-		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(3)`, &carYear, chromedp.ByQuery),
-		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data > tr > td:nth-of-type(5)`, &carPrice, chromedp.ByQuery),
-		*/
 	)
 	if err != nil {
 		//실패시 fail출력
@@ -120,7 +106,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		return 
 	}
 	
-	if strings.Compare(carSearch, "데이터가 없습니다.") == 0 {
+	if strings.Compare(carSearch, "데이터가 없습니다.") == 0 || strings.Compare(carSearch, "") == 0 {
 		//실패시 fail출력
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "fail"
@@ -133,45 +119,23 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		return 
 	}
 	
-	/*
-	if strings.Compare(carName, "") == 0 {
-		//실패시 fail출력
-		res.Header().Set("Content-Type", "application/json")
-		resdata["status"] = "fail"
-		resdata["errormsg"] = "차량번호를 찾을 수 없습니다"
-		output, err := json.Marshal(resdata)
-		if err != nil {
-			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-		}
-		res.Write(output)
-		return 
-	}
-	*/
+	//탭단위 데이터로 구분하여 가져온다.
+	//"팰리세이드(PALISADE)\tLX8ABC-22-H0N\t2021\t1\t24,000,000\t-\t-"
+	carDetails := strings.Split(carSearch, "\t")
 	
-	res.Header().Set("Content-Type", "application/json")
-	resdata["status"] = "fail"
-	resdata["errormsg"] = carSearch
-	output, err := json.Marshal(resdata)
-	if err != nil {
-		//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-	}
-	res.Write(output)
-	return 
-	
-	/*
 	//성공시 출력
 	res.Header().Set("Content-Type", "application/json")
 	resdata["status"] = "success"
 	resdata["platecode"] = plateCode
-	resdata["name"] = carName
-	resdata["type"] = carType
-	resdata["year"] = carYear
-	resdata["price"] = carPrice
+	resdata["name"] = carDetails[0]
+	resdata["type"] = carDetails[1]
+	resdata["year"] = carDetails[2]
+	resdata["price"] = carDetails[4]
 	output, err := json.Marshal(resdata)
 	if err != nil {
 		//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 	}
 	res.Write(output)
 	return 
-	*/
+	
 }

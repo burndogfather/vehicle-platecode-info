@@ -87,6 +87,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter) {
 		chromedp.SendKeys(`input#search_str`, plateCode, chromedp.ByQuery),
 		chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
 		chromedp.Text(`tbody#usedcarcompare_data`, &carSearch, chromedp.ByQuery),
+		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
 	)
 
 	if err != nil {

@@ -104,9 +104,10 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		*/
 		
 		//최대 대기시간은 15초
-		chromedpCtx, cancel = context.WithTimeout(chromedpCtx, 30*time.Second)
+		ctx, cancel := context.WithTimeout(chromedpCtx, 30*time.Second)
+		defer cancel()
 		
-		crawling(chromedpCtx, plateCode, res)
+		crawling(ctx, plateCode, res)
 		
 	}else{
 		//실패시 fail출력

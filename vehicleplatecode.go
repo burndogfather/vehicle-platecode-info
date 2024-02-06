@@ -110,7 +110,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		//실패시 fail출력
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "fail"
-		resdata["errormsg"] = "존재하지 않는 차량번호입니다"
+		resdata["errormsg"] = "매매사업조합에 제시/매도정보를 제공하지 않은 차량입니다"
 		output, err := json.Marshal(resdata)
 		if err != nil {
 			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)

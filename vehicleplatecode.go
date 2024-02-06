@@ -43,27 +43,38 @@ func initChromedp() {
 }
 
 func requestHandler(res http.ResponseWriter, req *http.Request) {
-	if req.Method != "POST" {
-		http.Error(res, "Only POST method is supported", http.StatusMethodNotAllowed)
-		return
+	//반환될 Response 사전정의
+	res.WriteHeader(http.StatusCreated)
+	
+	//FORM > POST 데이터 가져오기
+	req.ParseForm()
+	postdata := req.PostForm
+	
+	//POST 데이터에서 url이라는 값을 찾아서 String을 벗기기(?)
+	if ( postdata["platecode"] != nil){ 
+		
+		//Map풀기
+		plateCode := postdata["platecode"][0]
+
+		// 요청별 컨텍스트 생성
+		taskCtx, cancel := context.WithTimeout(chromedpCtx, 30*time.Second)
+		defer cancel()
+	
+		crawling(taskCtx, plateCode, res)
+		
+	}else{
+		//실패시 fail출력
+		res.Header().Set("Content-Type", "application/json")
+		resdata := make(map[string]string)
+		resdata["status"] = "fail"
+		resdata["errormsg"] = "잘못된 데이터 입력입니다"
+		output, err := json.Marshal(resdata)
+		if err != nil {
+			//log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+		res.Write(output)
+		return 
 	}
-
-	if err := req.ParseForm(); err != nil {
-		http.Error(res, "Invalid form data", http.StatusBadRequest)
-		return
-	}
-
-	plateCode := req.FormValue("platecode")
-	if plateCode == "" {
-		http.Error(res, "platecode is required", http.StatusBadRequest)
-		return
-	}
-
-	// 요청별 컨텍스트 생성
-	taskCtx, cancel := context.WithTimeout(chromedpCtx, 30*time.Second)
-	defer cancel()
-
-	crawling(taskCtx, plateCode, res)
 }
 
 func crawling(ctx context.Context, plateCode string, res http.ResponseWriter) {

@@ -77,6 +77,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 	}else{
 		//실패시 fail출력
+		res.Header().Set("Access-Control-Allow-Origin", "*")
 		res.Header().Set("Content-Type", "application/json")
 		resdata := make(map[string]string)
 		resdata["status"] = "fail"
@@ -106,6 +107,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	)
 	if err != nil {
 		//실패시 fail출력
+		res.Header().Set("Access-Control-Allow-Origin", "*")
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "fail"
 		resdata["errormsg"] = err.Error()
@@ -119,6 +121,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	
 	if strings.Compare(carSearch, "데이터가 없습니다.") == 0 || strings.Compare(carSearch, "") == 0 {
 		//실패시 fail출력
+		res.Header().Set("Access-Control-Allow-Origin", "*")
 		res.Header().Set("Content-Type", "application/json")
 		resdata["status"] = "fail"
 		resdata["errormsg"] = "매매사업조합에 제시/매도정보를 제공하지 않은 차량입니다"
@@ -135,6 +138,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	carDetails := strings.Split(carSearch, "\t")
 	
 	//성공시 출력
+	res.Header().Set("Access-Control-Allow-Origin", "*")
 	res.Header().Set("Content-Type", "application/json")
 	resdata["status"] = "success"
 	resdata["platecode"] = plateCode

@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 	"strings"
-	//"fmt"
+	"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
@@ -47,7 +47,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//Map풀기
 		plateCode := postdata["platecode"][0]
-		//fmt.Println(plateCode);
+		
 		
 		// 크롬 옵션 설정
 		opts := append(chromedp.DefaultExecAllocatorOptions[:],
@@ -58,7 +58,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			// 샌드박스 없이 실행 (일부 환경에서 필요할 수 있음)
 			chromedp.Flag("no-sandbox", true),
 			// 이미지 로딩 비활성화 (크롤링 성능 향상)
-			//chromedp.Flag("blink-settings", "imagesEnabled=false"),
+			chromedp.Flag("blink-settings", "imagesEnabled=false"),
 		)
 		
 		// 커스텀 옵션을 사용하여 Allocator 컨텍스트 생성
@@ -97,6 +97,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	
 	//사이트 캡쳐해서 버퍼생성
 	var carSearch string
+	var body string
 	err := chromedp.Run(ctx,
 		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
@@ -104,8 +105,11 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		chromedp.SendKeys(`input#search_str`, plateCode),
 		chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
 		chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data`, chromedp.ByQuery),
+		chromedp.Text(`body`, &body, chromedp.ByQuery),
 		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data`, &carSearch, chromedp.ByQuery),
 	)
+	fmt.Println(plateCode);
+	fmt.Println(body);
 	if err != nil {
 		//실패시 fail출력
 		res.Header().Set("Access-Control-Allow-Origin", "*")

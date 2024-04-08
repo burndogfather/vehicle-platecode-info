@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 	"strings"
-	"fmt"
+	//"fmt"
 	
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
@@ -47,7 +47,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//Map풀기
 		plateCode := postdata["platecode"][0]
-		fmt.Println(plateCode);
+		
 		
 		// 크롬 옵션 설정
 		opts := append(chromedp.DefaultExecAllocatorOptions[:],
@@ -100,14 +100,12 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	err := chromedp.Run(ctx,
 		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),
-		chromedp.WaitVisible(`#search_str`, chromedp.ByID),
+		chromedp.WaitVisible(`body`, chromedp.ByQuery),
 		chromedp.SendKeys(`input#search_str`, plateCode),
 		chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
-		chromedp.WaitVisible(`#usedcarcompare_data`, chromedp.ByID),
-		chromedp.Text(`#usedcarcompare_data`, &carSearch, chromedp.ByID),
+		chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data`, chromedp.ByQuery),
+		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data`, &carSearch, chromedp.ByQuery),
 	)
-	
-	fmt.Println(carSearch);
 	if err != nil {
 		//실패시 fail출력
 		res.Header().Set("Access-Control-Allow-Origin", "*")

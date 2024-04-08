@@ -47,7 +47,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 		
 		//Map풀기
 		plateCode := postdata["platecode"][0]
-		
+		fmt.Println(plateCode);
 		
 		// 크롬 옵션 설정
 		opts := append(chromedp.DefaultExecAllocatorOptions[:],
@@ -106,7 +106,7 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		chromedp.WaitVisible(`#usedcarcompare_data`, chromedp.ByID),
 		chromedp.Text(`#usedcarcompare_data`, &carSearch, chromedp.ByID),
 	)
-	fmt.Println(plateCode);
+	
 	fmt.Println(carSearch);
 	if err != nil {
 		//실패시 fail출력

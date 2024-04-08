@@ -97,7 +97,6 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 	
 	//사이트 캡쳐해서 버퍼생성
 	var carSearch string
-	var body string
 	err := chromedp.Run(ctx,
 		emulation.SetUserAgentOverride(`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`), //USER AGENT설정
 		chromedp.Navigate(`https://www.car365.go.kr/web/contents/websold_vehicle.do`),

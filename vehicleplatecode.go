@@ -103,8 +103,8 @@ func crawling(ctx context.Context, plateCode string, res http.ResponseWriter){
 		chromedp.WaitVisible(`body`),
 		chromedp.SendKeys(`input#search_str`, plateCode),
 		chromedp.EvaluateAsDevTools(`usedCarCompareInfo("search")`, nil),
-		chromedp.WaitVisible(`div.tblwrap_basic tbody#usedcarcompare_data`),
-		chromedp.Text(`div.tblwrap_basic tbody#usedcarcompare_data`, &carSearch, chromedp.ByQuery),
+		chromedp.WaitVisible(`#usedcarcompare_data`),
+		chromedp.Text(`#usedcarcompare_data`, &carSearch, chromedp.ByQuery),
 	)
 	fmt.Println(plateCode);
 	fmt.Println(carSearch);

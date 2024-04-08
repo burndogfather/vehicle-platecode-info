@@ -58,7 +58,7 @@ func requestHandler(res http.ResponseWriter, req *http.Request) {
 			// 샌드박스 없이 실행 (일부 환경에서 필요할 수 있음)
 			chromedp.Flag("no-sandbox", true),
 			// 이미지 로딩 비활성화 (크롤링 성능 향상)
-			chromedp.Flag("blink-settings", "imagesEnabled=false"),
+			//chromedp.Flag("blink-settings", "imagesEnabled=false"),
 		)
 		
 		// 커스텀 옵션을 사용하여 Allocator 컨텍스트 생성

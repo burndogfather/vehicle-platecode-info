@@ -25,7 +25,7 @@ CentOS7 기준에서 설치하는 방법입니다.
    
 종속 라이브러리 목록   
 - Go : 프로그램구동용
-- Go Chromedp : Golang에서 구글크롬을 제어하기 위한 라이브러리
+- Go chromedp : Golang에서 구글크롬을 제어하기 위한 라이브러리
 - Go cdproto : Golang에서 구글크롬의 개발자모드를 사용하기 위한 라이브러리
 - Google Chrome : 크롤링을 위한 브라우저
 - Nginx : 차량조회를 위한 API의 웹프록시
@@ -52,6 +52,7 @@ cd /usr/local/go/bin
 ./go version
 
 vi ~/.bash_profile
+# 아래내용 추가
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:/usr/local/go/bin
@@ -79,6 +80,7 @@ rm -rf google-chrome-stable-123.0.6312.105-1.x86_64.rpm
   
 ```bash
 yum -y install unzip
+cd
 wget https://github.com/burndogfather/vehicle-platecode-info/archive/refs/heads/main.zip
 unzip main.zip -d /
 cd /vehicle-platecode-info-main/
@@ -93,7 +95,8 @@ rm -rf vehicleplatecode
 go build vehicleplatecode.go 
 ls -al
 chmod -R 755 ./vehicleplatecode
-rm -rf ../main.zip
+cd
+rm -rf main.zip
 ```
 
 
@@ -101,6 +104,7 @@ rm -rf ../main.zip
   
 ```bash
 vi /etc/rc.local
+# 아래내용 추가
 nohup /vehicle-platecode-info-main/vehicleplatecode > /dev/null &
 :wq
 
@@ -109,6 +113,7 @@ systemctl status rc-local.service
 systemctl start rc-local.service
 
 vi /usr/lib/systemd/system/rc-local.service
+# 아래내용 추가
 [Install]
 WantedBy=multi-user.target
 :wq
@@ -117,4 +122,127 @@ systemctl enable rc-local.service
 systemctl list-unit-files | grep rc.local
 systemctl status rc-local.service
 ps -ef | grep vehicleplatecode
+```
+
+
+### 6. Nginx ReversProxy 설치
+  
+```bash
+cd
+wget https://nginx.org/packages/rhel/7/x86_64/RPMS/nginx-1.20.1-1.el7.ngx.x86_64.rpm
+rpm -Uvh nginx-1.20.1-1.el7.ngx.x86_64.rpm 
+
+vi /etc/yum.repos.d/nginx.repo
+# 아래내용 입력
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/centos/7/$basearch/
+gpgcheck=0
+enabled=1
+:wq
+
+yum -y install pcre-devel libxml2-devel zlib zlib-devel openssl openssl-devel gcc g++ cpp gcc-c++ libxslt libxslt-devel libgd-dev gd gd-devel perl perl-ExtUtils-Embed geoip-devel
+yum -y install nginx
+service nginx start
+sudo systemctl enable nginx
+
+sudo firewall-cmd --permanent --zone=public --add-service=ssh
+sudo firewall-cmd --permanent --zone=public --add-service=http
+sudo firewall-cmd --permanent --zone=public --add-service=https
+sudo firewall-cmd --reload
+
+mkdir /nginx_cache
+chmod -R 755 /nginx_cache
+chown -R nginx:nginx /nginx_cache
+
+rm -rf /etc/nginx/nginx.conf
+
+vi /etc/nginx/nginx.conf
+# 아래내용 입력
+user  nginx;
+worker_processes  auto;
+error_log  /var/log/nginx/error.log crit;
+pid        /var/run/nginx.pid;
+events {
+	worker_connections  1024;
+	use epoll;
+	multi_accept on;
+}
+http {
+	include       /etc/nginx/mime.types;
+	default_type  application/octet-stream;
+	server_tokens off;
+	client_body_buffer_size 128k;
+	client_header_buffer_size 1m;
+	client_max_body_size 2000m;
+	large_client_header_buffers 8 8k;
+	output_buffers 1 32k;
+	postpone_output 1460;
+	client_header_timeout 3m;
+	client_body_timeout   3m;
+	send_timeout          3m;
+   log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+					  '$status $body_bytes_sent "$http_referer" '
+					  '"$http_user_agent" "$http_x_forwarded_for"';
+	access_log  off;
+	server_names_hash_bucket_size 64;
+	server_names_hash_max_size 2048;
+	keepalive_timeout 10;
+	sendfile        off;
+	tcp_nopush     off;
+	tcp_nodelay    off;
+	types_hash_max_size 2048;
+	proxy_cache_path /nginx_cache keys_zone=cache:10m levels=1:2 inactive=600s max_size=1g;
+	gzip  on;
+	gzip_buffers 16 8k;
+	gzip_comp_level 6;
+	gzip_http_version 1.0;
+	gzip_min_length 1;
+	gzip_types application/x-javascript text/css application/javascript text/javascript text/plain application/json application/vnd.ms-fontobject application/x-font-opentype application/x-font-truetype application/x-font-ttf application/xml font/eot font/opentype font/otf image/svg+xml image/vnd.microsoft.icon;
+
+	include /etc/nginx/conf.d/*.conf;
+}
+:wq
+
+vi /etc/nginx/conf.d/도메인명.conf
+# 아래내용 입력
+server {
+		server_name 도메인명;
+		charset utf-8;
+		location / {
+				proxy_pass http://127.0.0.1:8001;
+				proxy_redirect off;
+				proxy_pass_header Server;
+				proxy_set_header Host $http_host;
+				proxy_set_header X-Real-IP $remote_addr;
+				proxy_set_header X-Scheme $scheme;
+				proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+				proxy_set_header X-Forwarded-Server $host;
+				proxy_set_header X-Forwarded-Host $host;
+
+		}
+}
+:wq
+
+service nginx restart
+sudo yum -y install epel-release yum-utils
+sudo yum -y install certbot certbot-nginx
+sudo certbot --nginx
+
+vi /etc/nginx/conf.d/도메인명.conf
+# 아래내용 추가
+http2_push_preload on;
+# 아래내용 변경
+ssl; ->> ssl http2;
+:wq
+
+service nginx restart
+
+sudo crontab -e
+# 아래내용 추가
+0 1 * * * /usr/bin/certbot renew
+:wq
+
+service crond restart
+setsebool httpd_can_network_connect on -P
 ```

@@ -74,3 +74,25 @@ wget https://dl.google.com/linux/chrome/rpm/stable/x86_64/google-chrome-stable-1
 sudo yum -y localinstall google-chrome-stable-123.0.6312.105-1.x86_64.rpm
 rm -rf google-chrome-stable-123.0.6312.105-1.x86_64.rpm
 ```
+
+
+### 4. 차량조회 프로그램 설치
+  
+```bash
+yum -y install unzip
+wget https://github.com/burndogfather/vehicle-platecode-info/archive/refs/heads/main.zip
+unzip main.zip -d /
+cd /vehicle-platecode-info-main/
+go mod init dadolcorp.com/vehicle-platecode-info
+go get github.com/chromedp/chromedp
+go get github.com/chromedp/cdproto/emulation
+
+go run vehicleplatecode.go
+Ctrl+C
+
+rm -rf vehicleplatecode
+go build vehicleplatecode.go 
+ls -al
+chmod -R 755 ./vehicleplatecode
+rm -rf ../main.zip
+```

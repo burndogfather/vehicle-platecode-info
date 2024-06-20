@@ -233,7 +233,7 @@ vi /etc/nginx/conf.d/도메인명.conf
 # 아래내용 추가
 http2_push_preload on;
 # 아래내용 변경
-ssl; ->> ssl http2;
+listen 443 ssl; ->> listen 443 ssl http2;
 :wq
 
 service nginx restart

@@ -20,18 +20,17 @@
    
 # 설치방법
   
-```bash
-# CentOS7 기준에서 설치하는 방법입니다.
-# 다른 OS에서 설치시 이 설치방법은 참고용으로만 사용해주세요.
-
-# 종속 라이브러리 목록
-# - Go : 프로그램구동용
-# - Go Chromedp : Golang에서 구글크롬을 제어하기 위한 라이브러리
-# - Go cdproto : Golang에서 구글크롬의 개발자모드를 사용하기 위한 라이브러리
-# - Google Chrome : 크롤링을 위한 브라우저
-# - Nginx : 차량조회를 위한 API의 웹프록시
-# - Certbot : 웹프록시에 Letsencrypt SSL을 사용하기 위한 도구
-```
+CentOS7 기준에서 설치하는 방법입니다.   
+다른 OS에서 설치시 이 설치방법은 참고용으로만 사용해주세요.
+   
+종속 라이브러리 목록   
+- Go : 프로그램구동용
+- Go Chromedp : Golang에서 구글크롬을 제어하기 위한 라이브러리
+- Go cdproto : Golang에서 구글크롬의 개발자모드를 사용하기 위한 라이브러리
+- Google Chrome : 크롤링을 위한 브라우저
+- Nginx : 차량조회를 위한 API의 웹프록시
+- Certbot : 웹프록시에 Letsencrypt SSL을 사용하기 위한 도구
+   
 
 ### 1. 시스템 패키지 및 날짜정보 동기화
   

@@ -76,7 +76,7 @@ rm -rf google-chrome-stable-123.0.6312.105-1.x86_64.rpm
 ```
 
 
-### 4. 차량조회 프로그램 설치
+### 4. 차량조회 프로그램 컴파일 및 설치
   
 ```bash
 yum -y install unzip
@@ -95,4 +95,27 @@ go build vehicleplatecode.go
 ls -al
 chmod -R 755 ./vehicleplatecode
 rm -rf ../main.zip
+```
+
+
+### 5. 부팅시 차량조회 프로그램 작동하도록 설정
+  
+```bash
+vi /etc/rc.local
+nohup /vehicle-platecode-info-main/vehicleplatecode > /dev/null &
+:wq
+
+chmod +x /etc/rc.d/rc.local
+systemctl status rc-local.service
+systemctl start rc-local.service
+
+vi /usr/lib/systemd/system/rc-local.service
+[Install]
+WantedBy=multi-user.target
+:wq
+
+systemctl enable rc-local.service
+systemctl list-unit-files | grep rc.local
+systemctl status rc-local.service
+ps -ef | grep vehicleplatecode
 ```

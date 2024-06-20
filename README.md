@@ -64,3 +64,13 @@ go env -w GO111MODULE=auto
 cd 
 rm -rf go1.22.1.linux-amd64.tar.gz
 ```
+
+
+### 3. 구글크롬 브라우저 설치
+  
+```bash
+# 참고) 크롬버전 123버전을 설치해야 CentOS7에서 사용하는 glibc 2.17버전에 대응이 가능함.
+wget https://dl.google.com/linux/chrome/rpm/stable/x86_64/google-chrome-stable-123.0.6312.105-1.x86_64.rpm
+sudo yum -y localinstall google-chrome-stable-123.0.6312.105-1.x86_64.rpm
+rm -rf google-chrome-stable-123.0.6312.105-1.x86_64.rpm
+```

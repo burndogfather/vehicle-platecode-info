@@ -125,7 +125,7 @@ ps -ef | grep vehicleplatecode
 ```
 
 
-### 6. Nginx ReversProxy 설치
+### 6. Nginx ReversProxy 설치 및 SSL 설정
   
 ```bash
 cd

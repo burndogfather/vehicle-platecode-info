@@ -125,7 +125,7 @@ ps -ef | grep vehicleplatecode
 ```
 
 
-### 6. Nginx ReversProxy 설치 및 SSL 설정
+### 6. Nginx ReversProxy
   
 ```bash
 cd
@@ -225,6 +225,13 @@ server {
 :wq
 
 service nginx restart
+setsebool httpd_can_network_connect on -P
+```
+
+
+### 7. SSL 설정
+  
+```bash
 sudo yum -y install epel-release yum-utils
 sudo yum -y install certbot certbot-nginx
 sudo certbot --nginx
@@ -244,5 +251,4 @@ sudo crontab -e
 :wq
 
 service crond restart
-setsebool httpd_can_network_connect on -P
 ```

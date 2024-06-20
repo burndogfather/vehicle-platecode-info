@@ -1,6 +1,6 @@
 # vehicle-platecode-info
 <img src="https://img.shields.io/github/size/burndogfather/vehicle-platecode-info/vehicleplatecode.go"/>
-한국 차량번호 정보조회
+한국 차량번호 정보조회 (feat. Golang)
    
 ![스크린샷 2024-06-20 오전 10 53 20](https://github.com/burndogfather/vehicle-platecode-info/assets/101985768/0556fb4b-44ec-4b91-b5da-3e128c98418b)
    

@@ -22,11 +22,29 @@
   
 ```bash
 
-<!-- Specify UTF-8 language set -->
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+# CentOS7 기준에서 설치하는 방법입니다.
+# 다른 OS에서 설치시 이 설치방법은 참고용으로만 사용해주세요.
 
-<!-- cocoBottomSheetJS library -->
-<link rel='stylesheet' href='https://git.coco.sqs.kr/cocoBottomSheetJS/src/cocoBottomSheetJS.css'>
-<script src='https://git.coco.sqs.kr/cocoBottomSheetJS/src/cocoBottomSheetJS.js'></script>
+# 종속 라이브러리 목록
+# - Go : 프로그램구동용
+# - Go Chromedp : Golang에서 구글크롬을 제어하기 위한 라이브러리
+# - Go cdproto : Golang에서 구글크롬의 개발자모드를 사용하기 위한 라이브러리
+# - Google Chrome : 크롤링을 위한 브라우저
+# - Nginx : 차량조회를 위한 API의 웹프록시
+# - Certbot : 웹프록시에 Letsencrypt SSL을 사용하기 위한 도구
+
+yum update -y
+yum install net-tools -y
+yum install rdate -y
+rdate -s time.bora.net
+
+cd
+wget  https://go.dev/dl/go1.22.1.linux-amd64.tar.gz
+rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.1.linux-amd64.tar.gz
+cd /usr/local/go/bin
+./go version
+
+vi ~/.bash_profile
+
 
 ```

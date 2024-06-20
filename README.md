@@ -1,4 +1,5 @@
 # vehicle-platecode-info
+<img src="https://img.shields.io/github/size/squarehacker/vehicle-platecode-info/vehicleplatecode.go"/>
 한국 차량번호 정보조회
    
 ![스크린샷 2024-06-20 오전 10 53 20](https://github.com/burndogfather/vehicle-platecode-info/assets/101985768/0556fb4b-44ec-4b91-b5da-3e128c98418b)
@@ -16,3 +17,16 @@
 - 조회실패사유 (errormsg)
    
 ------  
+   
+# 설치방법
+  
+```bash
+
+<!-- Specify UTF-8 language set -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<!-- cocoBottomSheetJS library -->
+<link rel='stylesheet' href='https://git.coco.sqs.kr/cocoBottomSheetJS/src/cocoBottomSheetJS.css'>
+<script src='https://git.coco.sqs.kr/cocoBottomSheetJS/src/cocoBottomSheetJS.js'></script>
+
+```

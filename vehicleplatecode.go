@@ -1,7 +1,7 @@
 package main
 import (
 		"context"
-		"log"
+		//"log"
 		"time"
 		"strings"
 		"fmt"
@@ -53,7 +53,7 @@ func crawling(ctx context.Context, plateCode string){
 	
 	//탭단위 데이터로 구분하여 가져온다.
 	//"팰리세이드(PALISADE)\tLX8ABC-22-H0N\t2021\t1\t24,000,000\t-\t-"
-	carDetails := strings.Split(carSearch, "\t")
-	fmt.Println("output : %s", carDetails);
+	//carDetails := strings.Split(carSearch, "\t")
+	fmt.Println("output : %s", carSearch);
 	return
 }
